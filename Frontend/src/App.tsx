@@ -9,9 +9,9 @@ function App() {
         <>
             {/* <div className="bg-(--color-sec)">App</div> */}
             <Routes>
-                <Route path="/" element={<Layout/>}>
+                <Route path="/recruiter" element={<Layout/>}>
                     <Route index element={<Dashboard />} />
-                    <Route path="create" element={<CreateInterview />} />
+                    <Route path="create-interview" element={<CreateInterview />} />
                     <Route path="manage-interview" element={<ManageInterview />} />
                 </Route>
             </Routes>

@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import {
   Home,
@@ -10,6 +8,8 @@ import {
   AudioWaveform,
   Command,
 } from "lucide-react"
+import { useLocation } from "react-router-dom"
+
 
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -31,17 +31,17 @@ import {
 const items = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/recruiter",
     icon: Home,
   },
   {
     title: "Create Interview",
-    url: "/create",
+    url: "/recruiter/create-interview",
     icon: Plus,
   },
   {
     title: "Manage Interivew",
-    url: "/manage-interview",
+    url: "/recruiter/manage-interview",
     icon: FileText,
   },
 ]
@@ -71,10 +71,13 @@ const data = {
   ],
 }
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { pathname } = useLocation()
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
+        {/* <h1 className="text-2xl font-semibold">Smart Recruiter</h1> */}
       </SidebarHeader>
 
       <SidebarContent>
@@ -83,8 +86,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                <SidebarMenuItem key={item.title} className="h-10">
+                  <SidebarMenuButton asChild className="h-10" isActive={pathname === item.url} >
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
