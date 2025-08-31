@@ -1,6 +1,6 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter } from '../components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter } from '../../components/ui/card';
 import { Users, Clock8, CircleCheckBig, TrendingUp, Code } from 'lucide-react'
-import { Button } from '../components/ui/button';
+import { Button } from '../../components/ui/button';
 import { Badge } from "@/components/ui/badge"
 
 const metrics = [
@@ -58,7 +58,7 @@ const recentInterviews = [
 
 ];
 
-function Dashboard() {
+function RecruiterDashboard() {
     return (
         <div className='flex flex-1 flex-col gap-4'>
             <section className='flex flex-col gap-4'>
@@ -69,7 +69,7 @@ function Dashboard() {
 
                 <div className='flex gap-4'>
                     {metrics.map((item) => (
-                        <Card className="flex flex-row justify-between items-center w-[290px] px-4 py-8 rounded-sm" key={item.title}>
+                        <Card className="flex flex-row flex-1 justify-between items-center h-[120px] px-4 py-8 rounded-sm" key={item.title}>
                             <div className="flex flex-col gap-1">
                                 <div className="text-sm text-muted-foreground font-semibold">{item.title}</div>
                                 <div className="text-2xl font-bold">{item.value}</div>
@@ -96,7 +96,7 @@ function Dashboard() {
 
                 <div className='grid grid-cols-2 gap-4'>
                     {recentInterviews.map((item) => (
-                        <Card className='rounded-sm'>
+                        <Card className='rounded-sm w-full'>
                             <CardHeader>
                                 <div className='flex justify-between'>
                                     <CardTitle className='font-semibold text-lg'>{item.title}</CardTitle>
@@ -135,4 +135,4 @@ function Dashboard() {
     )
 }
 
-export default Dashboard
+export default RecruiterDashboard
