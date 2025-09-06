@@ -43,7 +43,11 @@ function Login() {
 
         if (payload && payload.data && payload.data.status) {
             toast.success(payload.data.message)
-            navigate('/')
+
+            if (payload.data.user.role === 'candidate')
+                navigate('/candidate')
+            else
+                navigate('/recruiter');
         }
     }
 

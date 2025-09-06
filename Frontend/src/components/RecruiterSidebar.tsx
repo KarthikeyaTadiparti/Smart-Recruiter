@@ -1,7 +1,7 @@
 import * as React from "react"
 import {
   Home,
-  LayoutDashboard,
+  ArrowBigUpDash,
   Plus,
   FileText,
   GalleryVerticalEnd,
@@ -12,7 +12,6 @@ import { useLocation } from "react-router-dom"
 
 
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -70,15 +69,16 @@ const data = {
     },
   ],
 }
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function RecruiterSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { pathname } = useLocation()
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
-        {/* <h1 className="text-2xl font-semibold">Smart Recruiter</h1> */}
+      <SidebarHeader className="flex flex-row justify-center items-center">
+        <ArrowBigUpDash className="p-1 w-[35px] h-[35px] bg-primary text-white rounded-md" />
+        <h1 className="text-xl font-bold py-3 text-center">Smart Recruiter</h1>
       </SidebarHeader>
+
 
       <SidebarContent>
         <SidebarGroup>
@@ -86,8 +86,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title} className="h-10">
-                  <SidebarMenuButton asChild className="h-10" isActive={pathname === item.url} >
+                <SidebarMenuItem key={item.title} className="h-12">
+                  <SidebarMenuButton asChild className="h-12" isActive={pathname === item.url} >
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>

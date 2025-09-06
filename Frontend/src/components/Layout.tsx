@@ -1,4 +1,5 @@
-import { AppSidebar } from "@/components/app-sidebar"
+import { RecruiterSidebar } from "./RecruiterSidebar"
+import { CandidateSidebar } from "./CandidateSidebar"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -14,11 +15,14 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
+import {useLocation} from 'react-router-dom'
 
 export default function Layout() {
+    const location = useLocation()
     return (
         <SidebarProvider>
-            <AppSidebar />
+            {location.pathname === "/candidate" && <CandidateSidebar />}
+            {location.pathname === "/recruiter" && <RecruiterSidebar />}
             <SidebarInset>
                 <header className="sticky top-0 bg-[#ffffff] shadow-sm flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                     <div className="flex items-center gap-2 px-4">
