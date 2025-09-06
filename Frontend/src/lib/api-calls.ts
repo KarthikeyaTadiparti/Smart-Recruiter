@@ -1,6 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import { toast } from 'sonner';
-import { apiUrl } from '../config';
+
+const apiUrl = import.meta.env.VITE_API_URL
+
 
 export async function Post(url: string, data: object, navigate: any) {
     try {
@@ -12,6 +14,7 @@ export async function Post(url: string, data: object, navigate: any) {
         if (err.response) {
             if (err.response.status < 200 || err.response.status >= 300) {
                 if (err.response.status === 403 || err.response.status === 401) {
+                    console.log(err.response.data)
                     navigate('/login')
                     toast.error(err.response.data.message || "Please Login Again");
                 }
