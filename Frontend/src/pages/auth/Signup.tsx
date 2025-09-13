@@ -5,7 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { useState, FormEvent } from "react"
+import { useState, FormEvent } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,34 +13,38 @@ import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/hooks/use-redux"
 import { toast } from "sonner"
-import { _userLogin } from "@/redux/actions/auth-actions"
+import { _userSignup } from "@/redux/actions/auth-actions"
 
-type Role = "candidate" | "recruiter"
+type Role = "candidate" | "recruiter";
 
-interface Login {
-    email: string
-    password: string
-    role: Role
+interface Signup {
+    username: string;
+    email: string;
+    password: string;
+    role: Role;
 }
 
-function Login() {
+function Signup() {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
-    const [login, setLogin] = useState<Login>({
-        email: "",
-        password: "",
-        role: "candidate",
-    })
+    const [signup, setSignup] = useState<Signup>({
+        username: '',
+        email: '',
+        password: '',
+        role: "candidate"
+    });
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault()
-        const { payload } = await dispatch(_userLogin({ data: login, navigate }))
+        e.preventDefault();
+        const { payload } = await dispatch(_userSignup({ data: signup, navigate }));
 
         if (payload?.data?.status) {
             toast.success(payload.data.message)
 
-            if (payload.data.user.role === "candidate") navigate("/candidate")
-            else navigate("/recruiter")
+            if (payload.data.user.role === 'candidate')
+                navigate('/candidate')
+            else
+                navigate('/recruiter');
         }
     }
 
@@ -51,7 +55,7 @@ function Login() {
                     defaultValue="candidate"
                     className="pb-4"
                     onValueChange={(value) =>
-                        setLogin((prev) => ({ ...prev, role: value as Role }))
+                        setSignup((prev) => ({ ...prev, role: value as Role }))
                     }
                 >
                     <TabsList className="w-full h-[50px]">
@@ -59,70 +63,65 @@ function Login() {
                         <TabsTrigger value="recruiter">Recruiter</TabsTrigger>
                     </TabsList>
 
-                    {/* Candidate Login */}
                     <TabsContent value="candidate">
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-2xl font-semibold text-center">
-                                    Candidate Login
+                                    Candidate Signup
                                 </CardTitle>
                                 <CardDescription className="text-center">
-                                    Enter your email and password to access your account
+                                    Enter your details to create a candidate account
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleSubmit}>
                                     <div className="flex flex-col gap-6">
                                         <div className="grid gap-3">
+                                            <Label htmlFor="username">User Name</Label>
+                                            <Input
+                                                id="username"
+                                                type="text"
+                                                value={signup.username}
+                                                onChange={(e) =>
+                                                    setSignup((prev) => ({ ...prev, username: e.target.value }))
+                                                }
+                                                placeholder="Enter your name"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="grid gap-3">
                                             <Label htmlFor="email">Email</Label>
                                             <Input
                                                 id="email"
                                                 type="email"
-                                                value={login.email}
+                                                value={signup.email}
                                                 onChange={(e) =>
-                                                    setLogin((prev) => ({
-                                                        ...prev,
-                                                        email: e.target.value,
-                                                    }))
+                                                    setSignup((prev) => ({ ...prev, email: e.target.value }))
                                                 }
                                                 placeholder="abc@gmail.com"
                                                 required
                                             />
                                         </div>
                                         <div className="grid gap-3">
-                                            <div className="flex items-center">
-                                                <Label htmlFor="password">Password</Label>
-                                                <a
-                                                    href="#"
-                                                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                                >
-                                                    Forgot your password?
-                                                </a>
-                                            </div>
+                                            <Label htmlFor="password">Password</Label>
                                             <Input
                                                 id="password"
                                                 type="password"
-                                                value={login.password}
+                                                value={signup.password}
                                                 onChange={(e) =>
-                                                    setLogin((prev) => ({
-                                                        ...prev,
-                                                        password: e.target.value,
-                                                    }))
+                                                    setSignup((prev) => ({ ...prev, password: e.target.value }))
                                                 }
                                                 required
                                             />
                                         </div>
                                         <Button type="submit" className="w-full">
-                                            Login
+                                            Sign Up
                                         </Button>
                                     </div>
                                     <div className="mt-4 text-center text-sm">
-                                        Don&apos;t have an account?{" "}
-                                        <a
-                                            href="/signup"
-                                            className="underline underline-offset-4"
-                                        >
-                                            Sign up
+                                        Already have an account?{" "}
+                                        <a href="/login" className="underline underline-offset-4">
+                                            Login
                                         </a>
                                     </div>
                                 </form>
@@ -130,70 +129,65 @@ function Login() {
                         </Card>
                     </TabsContent>
 
-                    {/* Recruiter Login */}
                     <TabsContent value="recruiter">
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-2xl font-semibold text-center">
-                                    Recruiter Login
+                                    Recruiter Signup
                                 </CardTitle>
                                 <CardDescription className="text-center">
-                                    Enter your email and password to access your recruiter account
+                                    Enter your details to create a recruiter account
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleSubmit}>
                                     <div className="flex flex-col gap-6">
                                         <div className="grid gap-3">
-                                            <Label htmlFor="email">Email</Label>
+                                            <Label htmlFor="username">User Name</Label>
                                             <Input
-                                                id="email"
-                                                type="email"
-                                                value={login.email}
+                                                id="username"
+                                                type="text"
+                                                value={signup.username}
                                                 onChange={(e) =>
-                                                    setLogin((prev) => ({
-                                                        ...prev,
-                                                        email: e.target.value,
-                                                    }))
+                                                    setSignup((prev) => ({ ...prev, username: e.target.value }))
                                                 }
-                                                placeholder="recruiter@company.com"
+                                                placeholder="Enter your name"
                                                 required
                                             />
                                         </div>
                                         <div className="grid gap-3">
-                                            <div className="flex items-center">
-                                                <Label htmlFor="password">Password</Label>
-                                                <a
-                                                    href="#"
-                                                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                                >
-                                                    Forgot your password?
-                                                </a>
-                                            </div>
+                                            <Label htmlFor="email">Email</Label>
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                value={signup.email}
+                                                onChange={(e) =>
+                                                    setSignup((prev) => ({ ...prev, email: e.target.value }))
+                                                }
+                                                placeholder="abc@gmail.com"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="grid gap-3">
+                                            <Label htmlFor="password">Password</Label>
                                             <Input
                                                 id="password"
                                                 type="password"
-                                                value={login.password}
+                                                value={signup.password}
                                                 onChange={(e) =>
-                                                    setLogin((prev) => ({
-                                                        ...prev,
-                                                        password: e.target.value,
-                                                    }))
+                                                    setSignup((prev) => ({ ...prev, password: e.target.value }))
                                                 }
                                                 required
                                             />
                                         </div>
                                         <Button type="submit" className="w-full">
-                                            Login
+                                            Sign Up
                                         </Button>
                                     </div>
                                     <div className="mt-4 text-center text-sm">
-                                        Don&apos;t have an account?{" "}
-                                        <a
-                                            href="/signup"
-                                            className="underline underline-offset-4"
-                                        >
-                                            Sign up
+                                        Already have an account?{" "}
+                                        <a href="/login" className="underline underline-offset-4">
+                                            Login
                                         </a>
                                     </div>
                                 </form>
@@ -206,4 +200,4 @@ function Login() {
     )
 }
 
-export default Login
+export default Signup

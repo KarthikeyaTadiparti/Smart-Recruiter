@@ -10,6 +10,7 @@ import { Navigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { _userLogout } from "./redux/actions/auth-actions";
 import { toast } from "sonner";
+import Signup from "./pages/auth/Signup";
 
 const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
   const { userData, loading } = useAppSelector((state) => state.auth);
@@ -69,6 +70,7 @@ function App() {
 
         {/* public route */}
         <Route path="/login" element={<ProtectedAuthRoute element={<Login />} />} />
+        <Route path="/signup" element={<ProtectedAuthRoute element={<Signup />} />} />
 
         {/* protected routes */}
         <Route path="/recruiter" element={<ProtectedRoute element={<Layout />} />}>
