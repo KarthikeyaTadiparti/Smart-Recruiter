@@ -33,9 +33,9 @@ function Login() {
         role: "candidate"
     });
 
-    useEffect(() => {
-        console.log(login);
-    }, [login]);
+    // useEffect(() => {
+    //     console.log(login);
+    // }, [login]);
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();

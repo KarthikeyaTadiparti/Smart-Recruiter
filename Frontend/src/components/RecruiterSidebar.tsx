@@ -25,6 +25,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { useAppSelector } from "@/hooks/use-redux"
 
 // Menu items.
 const items = [
@@ -45,32 +46,10 @@ const items = [
   },
 ]
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-}
 export function RecruiterSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { pathname } = useLocation()
+  const { userData } = useAppSelector((state) => state.auth);
+  const user = userData?.data?.user;
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -101,7 +80,7 @@ export function RecruiterSidebar({ ...props }: React.ComponentProps<typeof Sideb
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

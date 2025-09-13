@@ -93,8 +93,8 @@ function CandidateDashboard() {
         </div>
 
         <div className='grid grid-cols-2 gap-4 w-full'>
-          {recentInterviews.map((item) => (
-            <Card className='rounded-sm w-full'>
+          {recentInterviews.map((item,index) => (
+            <Card className='rounded-sm w-full' key={index}>
               <CardHeader>
                 <div className='flex justify-between'>
                   <CardTitle className='font-semibold text-lg'>{item.title}</CardTitle>
