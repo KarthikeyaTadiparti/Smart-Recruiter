@@ -1,12 +1,6 @@
 import * as React from "react"
-import {
-  Home,
-  ArrowBigUpDash,
-  Search,
-  FileText,
-} from "lucide-react"
-import { useLocation } from "react-router-dom"
-
+import { Home, ArrowBigUpDash, Search, FileText } from "lucide-react"
+import { useLocation, Link } from "react-router-dom"
 
 import { NavUser } from "@/components/nav-user"
 import {
@@ -14,59 +8,50 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { useAppSelector } from "@/hooks/use-redux"
 
-// Menu items.
 const items = [
-  {
-    title: "Dashboard",
-    url: "/candidate",
-    icon: Home,
-  },
-  {
-    title: "Explore",
-    url: "/candidate/explore",
-    icon: Search,
-  },
-  {
-    title: "My Interivews",
-    url: "/candidate/my-interviews",
-    icon: FileText,
-  },
+  { title: "Dashboard", url: "/candidate", icon: Home },
+  { title: "Explore", url: "/candidate/explore", icon: Search },
+  { title: "My Interivews", url: "/candidate/my-interviews", icon: FileText },
 ]
 
-export function CandidateSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function CandidateSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { pathname } = useLocation()
-  const { userData } = useAppSelector((state) => state.auth);
-  const user = userData?.data?.user;
+  const { userData } = useAppSelector((state) => state.auth)
+  const user = userData?.data?.user
+  const { open } = useSidebar() 
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="flex flex-row justify-center items-center">
         <ArrowBigUpDash className="p-1 w-[35px] h-[35px] bg-primary text-white rounded-md" />
-        <h1 className="text-xl font-bold py-3 text-center">Smart Recruiter</h1>
+        {open && <h1 className="text-xl font-bold py-3 text-center">Smart Recruiter</h1>}
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          {/* <SidebarGroupLabel>Application</SidebarGroupLabel> */}
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title} className="h-12">
-                  <SidebarMenuButton asChild className="h-12" isActive={pathname === item.url} >
-                    <a href={item.url}>
+                  <SidebarMenuButton
+                    asChild
+                    className="h-12"
+                    isActive={pathname === item.url}
+                  >
+                    <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

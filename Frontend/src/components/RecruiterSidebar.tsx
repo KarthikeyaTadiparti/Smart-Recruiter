@@ -9,7 +9,7 @@ import {
   Command,
 } from "lucide-react"
 import { useLocation } from "react-router-dom"
-
+import { Link } from "react-router-dom"
 
 import { NavUser } from "@/components/nav-user"
 import {
@@ -67,10 +67,10 @@ export function RecruiterSidebar({ ...props }: React.ComponentProps<typeof Sideb
               {items.map((item) => (
                 <SidebarMenuItem key={item.title} className="h-12">
                   <SidebarMenuButton asChild className="h-12" isActive={pathname === item.url} >
-                    <a href={item.url}>
+                  <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

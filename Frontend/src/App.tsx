@@ -11,6 +11,8 @@ import { useEffect, useRef } from "react";
 import { _userLogout } from "./redux/actions/auth-actions";
 import { toast } from "sonner";
 import Signup from "./pages/auth/Signup";
+import Explore from "./pages/candidate/Explore";
+import MyInterviews from "./pages/candidate/MyInterviews";
 
 const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
   const { userData, loading } = useAppSelector((state) => state.auth);
@@ -81,8 +83,8 @@ function App() {
 
         <Route path="/candidate" element={<ProtectedRoute element={<Layout />} />}>
           <Route index element={<CandidateDashboard />} />
-          <Route path="create-interview" element={<CreateInterview />} />
-          <Route path="manage-interview" element={<ManageInterview />} />
+          <Route path="explore" element={<Explore />} />
+          <Route path="my-interviews" element={<MyInterviews />} />
         </Route>
 
 

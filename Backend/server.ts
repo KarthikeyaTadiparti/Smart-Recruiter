@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import { errorHandler, handle404Error } from "./middlewares/errorhandler.ts";
 import authRoutes from "./routes/authRoutes.ts";
-
+import morganMiddleware from "./config/morganConfig.ts";
 connectDB();
 
 const app = express();
@@ -16,7 +16,7 @@ const corsOptions = {
     credentials: true,
 };
 
-
+app.use(morganMiddleware);
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
