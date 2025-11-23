@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import Signup from "./pages/auth/Signup";
 import Explore from "./pages/candidate/Explore";
 import MyInterviews from "./pages/candidate/MyInterviews";
+import Test from "./pages/Test";
+import Cam from "./pages/Cam";
 
 const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
   const { userData, loading } = useAppSelector((state) => state.auth);
@@ -73,6 +75,8 @@ function App() {
         {/* public route */}
         <Route path="/login" element={<ProtectedAuthRoute element={<Login />} />} />
         <Route path="/signup" element={<ProtectedAuthRoute element={<Signup />} />} />
+        <Route path="/test" element={<Test/>}/>
+        <Route path="/cam" element={<Cam/>}/>
 
         {/* protected routes */}
         <Route path="/recruiter" element={<ProtectedRoute element={<Layout />} />}>
