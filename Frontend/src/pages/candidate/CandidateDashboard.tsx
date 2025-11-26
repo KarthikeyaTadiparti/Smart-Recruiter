@@ -59,9 +59,9 @@ const recentInterviews = [
 function CandidateDashboard() {
   return (
     <div className='flex flex-1 flex-col gap-4'>
-      <section className='flex flex-col gap-4'>
+      <section className='flex flex-col gap-4 my-4'>
         <div>
-          <h1 className='text-2xl font-semibold'>Overview</h1>
+          <h1 className='text-xl font-semibold'>Overview</h1>
           <p className='text-muted-foreground'>Key insights into your job applications</p>
         </div>
 
@@ -82,10 +82,10 @@ function CandidateDashboard() {
         </div>
       </section>
 
-      <section className='flex flex-col gap-4'>
+      <section className='flex flex-col gap-4 my-4'>
         <div className='flex flex-row justify-between items-center'>
           <div>
-            <h1 className='text-2xl font-semibold'>Recently Attended Interviews</h1>
+            <h1 className='text-xl font-semibold'>Recently Attended Interviews</h1>
             <p className='text-muted-foreground'>Track your upcoming and past interviews
             </p>
           </div>

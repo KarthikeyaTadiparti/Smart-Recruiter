@@ -15,6 +15,8 @@ import Explore from "./pages/candidate/Explore";
 import MyInterviews from "./pages/candidate/MyInterviews";
 import Test from "./pages/Test";
 import Cam from "./pages/Cam";
+import VapiWidget from "./pages/VapiWidget";
+
 
 const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
   const { userData, loading } = useAppSelector((state) => state.auth);
@@ -77,6 +79,7 @@ function App() {
         <Route path="/signup" element={<ProtectedAuthRoute element={<Signup />} />} />
         <Route path="/test" element={<Test/>}/>
         <Route path="/cam" element={<Cam/>}/>
+        <Route path="/vapi" element={<VapiWidget/>}/>
 
         {/* protected routes */}
         <Route path="/recruiter" element={<ProtectedRoute element={<Layout />} />}>

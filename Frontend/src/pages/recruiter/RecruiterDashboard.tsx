@@ -61,9 +61,9 @@ const recentInterviews = [
 function RecruiterDashboard() {
     return (
         <div className='flex flex-1 flex-col gap-4'>
-            <section className='flex flex-col gap-4'>
+            <section className='flex flex-col gap-4 my-4'>
                 <div>
-                    <h1 className='text-2xl font-semibold'>Overview</h1>
+                    <h1 className='text-xl font-semibold'>Overview</h1>
                     <p className='text-muted-foreground'>Key metrics for your recruitment activities</p>
                 </div>
 
@@ -84,10 +84,10 @@ function RecruiterDashboard() {
                 </div>
             </section>
 
-            <section className='flex flex-col gap-4'>
+            <section className='flex flex-col gap-4 my-4'>
                 <div className='flex flex-row justify-between items-center'>
                     <div>
-                        <h1 className='text-2xl font-semibold'>Recently Created Interviews</h1>
+                        <h1 className='text-xl font-semibold'>Recently Created Interviews</h1>
                         <p className='text-muted-foreground'>Manage and track your latest interview sessions
                         </p>
                     </div>
