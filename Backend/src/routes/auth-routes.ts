@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { handleUserSignup, handleUserLogin, handleUserLogout, handleGetAllUsers } from "../controllers/authController.ts";
-import { loginValidation, signupValidation } from "../middlewares/authValidation.ts";
+import { handleUserSignup, handleUserLogin, handleUserLogout, handleGetAllUsers } from "../controllers/auth-controller.ts";
+import { loginValidation, signupValidation } from "../middlewares/auth.ts";
 
 const router = Router();
 

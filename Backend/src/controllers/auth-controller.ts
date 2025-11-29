@@ -1,37 +1,31 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import User from "../models/userModel.ts";
-import ExpressError from "../utils/ExpressError.ts";
-import genJwt from "../utils/genJwt.ts";
-import wrapAsync from "../utils/wrapAsync.ts";
+import ExpressError from "../middlewares/errorhandler.ts";
+import genJwt from "../utils/gen-jwt.ts";
+import wrapAsync from "../utils/wrap-async.ts";
+import { createUser, getAllUsers, getUserByEmailAndRole } from "../services/user-services.ts";
 
 // Signup
 export const handleUserSignup = wrapAsync(async (req: Request, res: Response) => {
-    const { username, email, password, role } = req.body;
+    const { name, email, password, role } = req.body;
 
-    const user = await User.findOne({ email, role });
+    const user = await getUserByEmailAndRole(email, role);
     if (user)
-        return res.status(409).json({ status: false, message: "User already exists!" });
+        throw new ExpressError(409, "User already exists!");
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({
-        username,
-        email,
-        password: hashedPassword,
-        role
-    });
-    await newUser.save();
+    const newUser = await createUser (name,email,hashedPassword,role);
 
-    const id = newUser._id;
+    const id = newUser?.id;
     genJwt(res, id);
 
     return res.status(200).json({
         status: true,
         user: {
-            _id: newUser._id,
-            name: newUser.username,
-            email: newUser.email,
-            role: newUser.role
+            _id: newUser?.id,
+            name: newUser?.name,
+            email: newUser?.email,
+            role: newUser?.role
         },
         message: "User registered successfully!"
     });
@@ -41,21 +35,21 @@ export const handleUserSignup = wrapAsync(async (req: Request, res: Response) =>
 export const handleUserLogin = wrapAsync(async (req: Request, res: Response) => {
     const { email, password, role } = req.body;
 
-    const user = await User.findOne({ email, role });
+    const user = await getUserByEmailAndRole(email, role);
     if (!user)
-        return res.status(403).json({ status: false, message: "User does not exist!" });
+        throw new ExpressError(403, "User does not exist!");
 
     const isPassword = await bcrypt.compare(password, user.password);
     if (!isPassword)
-        return res.status(403).json({ status: false, message: "Invalid email or password!" });
+        throw new ExpressError(403, "Invalid email or password!");
 
-    genJwt(res, user._id);
+    genJwt(res, user.id);
 
     return res.status(200).json({
         status: true,
         user: {
-            _id: user._id,
-            name: user.username,
+            _id: user.id,
+            name: user.name,
             email: user.email,
             role: user.role
         },
@@ -79,7 +73,7 @@ export const handleUserLogout = wrapAsync(async (req: Request, res: Response) =>
 
 // Get all users
 export const handleGetAllUsers = wrapAsync(async (req: Request, res: Response) => {
-    const users = await User.find();
+    const users = await getAllUsers()
     return res.status(200).json({
         status: true,
         data: users

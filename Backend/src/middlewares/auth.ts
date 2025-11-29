@@ -1,11 +1,11 @@
 import { z } from "zod";
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
-import ExpressError from "../utils/ExpressError.ts";
+import ExpressError from "../utils/express-error.ts";
 
 //signup
 const signupSchema = z.object({
-    username: z.string().min(1, { message: "Username is required" }),
+    name: z.string().min(1, { message: "Name is required" }),
     email: z.string().min(1, { message: "Email is required" }),
     password: z.string().min(1, { message: "Password is required" }),
     role: z.enum(["candidate", "recruiter"], { message: "Role is required" }),

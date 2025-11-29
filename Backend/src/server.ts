@@ -3,10 +3,10 @@ import cors from "cors";
 import express from "express";
 import cookieParser from "cookie-parser";
 import { errorHandler, handle404Error } from "./middlewares/errorhandler.ts";
-import authRoutes from "./routes/authRoutes.ts";
-import morganMiddleware from "./config/morganConfig.ts";
+import authRoutes from "./routes/auth-routes.ts";
+import morganMiddleware from "./config/morgan.ts";
 import db from "./config/db.ts";
-import { users } from "./drizzle/schema.ts";
+import { users } from "./schema/users-schema.ts";
 
 const app = express();
 const { PORT, APP_URL } = process.env;
