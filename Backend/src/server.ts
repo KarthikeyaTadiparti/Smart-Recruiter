@@ -4,6 +4,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { errorHandler, handle404Error } from "./middlewares/errorhandler.ts";
 import authRoutes from "./routes/auth-routes.ts";
+import companyRoutes from "./routes/company-routes.ts";
 import morganMiddleware from "./config/morgan.ts";
 import db from "./config/db.ts";
 import { users } from "./schema/users-schema.ts";
@@ -23,6 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/auth',authRoutes);
+app.use('/companies',companyRoutes);
+
 app.get("/test", async (req, res) => {
   try {
     const rows = await db.select().from(users); 

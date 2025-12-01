@@ -40,7 +40,7 @@ export default function Layout() {
       {pathname.startsWith("/recruiter") && <RecruiterSidebar />}
 
       <SidebarInset>
-        <header className="sticky top-0 bg-white shadow-sm flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear">
+        <header className="z-100 sticky top-0 bg-white shadow-sm flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear">
           <div className="flex items-center gap-2 px-4">
             {/* Sidebar toggle button */}
             <SidebarTrigger className="-ml-1" />

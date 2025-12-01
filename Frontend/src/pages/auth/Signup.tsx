@@ -18,7 +18,7 @@ import { _userSignup } from "@/redux/actions/auth-actions"
 type Role = "candidate" | "recruiter";
 
 interface Signup {
-    username: string;
+    name: string;
     email: string;
     password: string;
     role: Role;
@@ -28,7 +28,7 @@ function Signup() {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
     const [signup, setSignup] = useState<Signup>({
-        username: '',
+        name: '',
         email: '',
         password: '',
         role: "candidate"
@@ -77,13 +77,13 @@ function Signup() {
                                 <form onSubmit={handleSubmit}>
                                     <div className="flex flex-col gap-6">
                                         <div className="grid gap-3">
-                                            <Label htmlFor="username">User Name</Label>
+                                            <Label htmlFor="name">User Name</Label>
                                             <Input
-                                                id="username"
+                                                id="name"
                                                 type="text"
-                                                value={signup.username}
+                                                value={signup.name}
                                                 onChange={(e) =>
-                                                    setSignup((prev) => ({ ...prev, username: e.target.value }))
+                                                    setSignup((prev) => ({ ...prev, name: e.target.value }))
                                                 }
                                                 placeholder="Enter your name"
                                                 required
@@ -143,13 +143,13 @@ function Signup() {
                                 <form onSubmit={handleSubmit}>
                                     <div className="flex flex-col gap-6">
                                         <div className="grid gap-3">
-                                            <Label htmlFor="username">User Name</Label>
+                                            <Label htmlFor="name">User Name</Label>
                                             <Input
-                                                id="username"
+                                                id="name"
                                                 type="text"
-                                                value={signup.username}
+                                                value={signup.name}
                                                 onChange={(e) =>
-                                                    setSignup((prev) => ({ ...prev, username: e.target.value }))
+                                                    setSignup((prev) => ({ ...prev, name: e.target.value }))
                                                 }
                                                 placeholder="Enter your name"
                                                 required

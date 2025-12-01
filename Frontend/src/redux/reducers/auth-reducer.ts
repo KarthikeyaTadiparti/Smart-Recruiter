@@ -1,5 +1,5 @@
     import { createSlice } from "@reduxjs/toolkit";
-    import { _userLogin, _userLogout, _userSignup } from "../actions/auth-actions";
+    import { _createCompany, _userLogin, _userLogout, _userSignup } from "../actions/auth-actions";
 
     interface AuthInitialStateType {
         loading: {
@@ -31,6 +31,7 @@
                 })
                 .addCase(_userLogin.fulfilled, (state, action) => {
                     state.loading.login = false
+                    // console.log("action.payload : ", action.payload);
                     state.userData = action.payload
                 })
                 .addCase(_userLogin.rejected, (state, action) => {
@@ -60,6 +61,11 @@
                 .addCase(_userLogout.rejected, (state, action) => {
                     state.loading.logout = false
                     state.error = action.error.message || "Please Try Again"
+                })
+                .addCase(_createCompany.fulfilled, (state, action) => {
+                    if (state.userData?.data && action.payload?.data?.company) {
+                        state.userData.data.company = action.payload.data.company
+                    }
                 })
         },
     })

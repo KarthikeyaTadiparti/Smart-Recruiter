@@ -1,6 +1,6 @@
 import db from "../config/db.ts";
 import { eq, and } from "drizzle-orm";
-import { userRoleEnum, users, User } from "../schema/users-schema.ts";
+import { userRoleEnum, users } from "../schema/users-schema.ts";
 
 export type UserRole = (typeof userRoleEnum.enumValues)[number];
 

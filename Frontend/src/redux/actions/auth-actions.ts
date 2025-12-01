@@ -15,3 +15,8 @@ export const _userLogout = createAsyncThunk<any, any>('userLogout', async (data:
     const response = await GetAll(`/auth/logout`, data.navigate)
     return response
 })
+
+export const _createCompany = createAsyncThunk<any, any>('createCompany', async (data: any) => {
+    const response: any = await Post(`/companies`, data.data, data.navigate)
+    return response
+})

@@ -66,6 +66,7 @@ function App() {
 
   useEffect(() => {
     console.log("user data : ", userData?.data?.user);
+    console.log("company details : ", userData?.data?.company);
   }, [userData]);
 
   return (

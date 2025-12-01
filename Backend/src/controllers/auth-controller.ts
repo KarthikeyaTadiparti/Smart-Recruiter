@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 import ExpressError from "../middlewares/errorhandler.ts";
 import genJwt from "../utils/gen-jwt.ts";
 import wrapAsync from "../utils/wrap-async.ts";
-import { createUser, getAllUsers, getUserByEmailAndRole } from "../services/user-services.ts";
+import { createUser, getAllUsers, getUserByEmailAndRole } from "../services/users-services.ts";
+import { getCompany } from "../services/companies-services.ts";
 
 // Signup
 export const handleUserSignup = wrapAsync(async (req: Request, res: Response) => {
@@ -16,17 +17,26 @@ export const handleUserSignup = wrapAsync(async (req: Request, res: Response) =>
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await createUser (name,email,hashedPassword,role);
 
-    const id = newUser?.id;
+    if (!newUser || !newUser.id) 
+        throw new ExpressError(500, "Failed to create user");
+
+    const id = newUser.id;
     genJwt(res, id);
+
+    let company;
+    if(newUser.role === "recruiter"){
+        company = await getCompany(newUser.id);
+    }
 
     return res.status(200).json({
         status: true,
         user: {
-            _id: newUser?.id,
-            name: newUser?.name,
-            email: newUser?.email,
-            role: newUser?.role
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            role: newUser.role
         },
+        company : company ? company : null,
         message: "User registered successfully!"
     });
 });
@@ -43,16 +53,22 @@ export const handleUserLogin = wrapAsync(async (req: Request, res: Response) => 
     if (!isPassword)
         throw new ExpressError(403, "Invalid email or password!");
 
+    let company;
+    if(user.role === "recruiter"){
+        company = await getCompany(user.id);
+    }
+
     genJwt(res, user.id);
 
     return res.status(200).json({
         status: true,
         user: {
-            _id: user.id,
+            id: user.id,
             name: user.name,
             email: user.email,
             role: user.role
         },
+        company : company ?? null,
         message: "User logged in successfully!"
     });
 });

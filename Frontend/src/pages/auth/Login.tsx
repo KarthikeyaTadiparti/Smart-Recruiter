@@ -37,8 +37,7 @@ function Login() {
         const { payload } = await dispatch(_userLogin({ data: login, navigate }))
 
         if (payload?.data?.status) {
-            toast.success(payload.data.message)
-
+            toast.success(payload.data.message);
             if (payload.data.user.role === "candidate") navigate("/candidate")
             else navigate("/recruiter")
         }

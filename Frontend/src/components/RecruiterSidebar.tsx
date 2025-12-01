@@ -26,6 +26,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { useAppSelector } from "@/hooks/use-redux"
+import { useSidebar } from "@/components/ui/sidebar"
 
 // Menu items.
 const items = [
@@ -50,12 +51,14 @@ export function RecruiterSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const { pathname } = useLocation()
   const { userData } = useAppSelector((state) => state.auth);
   const user = userData?.data?.user;
+  const { open } = useSidebar() 
+
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="flex flex-row justify-center items-center">
         <ArrowBigUpDash className="p-1 w-[35px] h-[35px] bg-primary text-white rounded-md" />
-        <h1 className="text-xl font-bold py-3 text-center">Smart Recruiter</h1>
+        {open && <h1 className="text-xl font-bold py-3 text-center">Smart Recruiter</h1>}
       </SidebarHeader>
 
 
