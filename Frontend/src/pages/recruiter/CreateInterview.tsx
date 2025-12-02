@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppDispatch } from "@/hooks/use-redux";
-import { _createJob } from "@/redux/actions/Job-actions";
+import { _generateQuestions } from "@/redux/actions/interview-actions";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +33,7 @@ export interface Job {
   closed_at: string; // "YYYY-MM-DD" or ""
   interview_duration: string;
   interview_type: string;
+  no_of_question: string;
 }
 
 function CreateInterview() {
@@ -46,6 +47,7 @@ function CreateInterview() {
       closed_at: "",
       interview_duration: "",
       interview_type: "",
+      no_of_question: "",
     },
   });
 
@@ -54,11 +56,12 @@ function CreateInterview() {
 
   const onSubmit: SubmitHandler<Job> = async (data) => {
     console.log("form submit:", data);
-    // const { payload } = await dispatch(_createJob({ data: data, navigate: navigate }))
+    const payload = await dispatch(_generateQuestions({ data: data, navigate: navigate }))
+    console.log("payload : ", payload);
 
     // if (payload?.data?.status) {
     //   toast.success(payload.data.message);
-    //   navigate("/jobs/:id")
+    //   navigate("/interview-questions/:id")
     // }
   };
 
@@ -121,22 +124,7 @@ function CreateInterview() {
               )}
             />
 
-            {/* Location */}
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Hyderabad" {...field} className="py-6" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Experience & Closed at */}
+            {/* Experience & Location */}
             <div className="flex gap-4 justify-center items-center">
               {/* Experience */}
               <FormField
@@ -153,6 +141,24 @@ function CreateInterview() {
                 )}
               />
 
+              {/* Location */}
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Location</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Hyderabad" {...field} className="py-6" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Closing Date & Questions */}
+            <div className="flex gap-4 justify-center items-center">
               {/* Closing Date */}
               <div className="flex-1">
                 <FormField
@@ -168,6 +174,30 @@ function CreateInterview() {
                   )}
                 />
               </div>
+
+              {/* No of Questions */}
+              <FormField
+                control={form.control}
+                name="no_of_question"
+                render={({ field }) => (
+                  <FormItem className="flex-1 space-y-2">
+                    <FormLabel>No. of Questions</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full py-6">
+                          <SelectValue placeholder="5 Questions" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="5">5 Questions</SelectItem>
+                        <SelectItem value="10">10 Questions</SelectItem>
+                        <SelectItem value="15">15 Questions</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Duration & Type */}
@@ -182,7 +212,7 @@ function CreateInterview() {
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full py-6">
-                          <SelectValue placeholder="Duration" />
+                          <SelectValue placeholder="5 Minutes" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

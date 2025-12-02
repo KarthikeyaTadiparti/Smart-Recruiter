@@ -20,13 +20,13 @@ export const handleUserSignup = wrapAsync(async (req: Request, res: Response) =>
     if (!newUser || !newUser.id) 
         throw new ExpressError(500, "Failed to create user");
 
-    const id = newUser.id;
-    genJwt(res, id);
-
     let company;
     if(newUser.role === "recruiter"){
         company = await getCompany(newUser.id);
     }
+    const id = newUser.id;
+    const companyId = company?.companyId;
+    genJwt(res, id, companyId);
 
     return res.status(200).json({
         status: true,
@@ -57,8 +57,9 @@ export const handleUserLogin = wrapAsync(async (req: Request, res: Response) => 
     if(user.role === "recruiter"){
         company = await getCompany(user.id);
     }
-
-    genJwt(res, user.id);
+    const id = user.id;
+    const companyId = company?.companyId;
+    genJwt(res, id, companyId);
 
     return res.status(200).json({
         status: true,

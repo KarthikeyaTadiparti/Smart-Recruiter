@@ -1,7 +1,7 @@
 import { z } from "zod";
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
-import ExpressError from "../utils/express-error.ts";
+import ExpressError from "./errorhandler.ts";
 
 //signup
 const signupSchema = z.object({
@@ -44,6 +44,7 @@ export function loginValidation(req: Request, res: Response, next: NextFunction)
 // Define custom user payload type (based on what's inside your JWT)
 interface JwtPayload {
     id: string;
+    companyId?: number;
 }
 
 // Extend Express Request to include `user`
@@ -62,6 +63,7 @@ export function ensureAuthentication(req: Request, res: Response, next: NextFunc
     try {
         const user = jwt.verify(jwtToken, process.env.JWT_SECRET!) as JwtPayload;
         req.user = user;
+        console.log("user : ",user);
         next();
     } catch (error) {
         throw new ExpressError(401, "Invalid token");

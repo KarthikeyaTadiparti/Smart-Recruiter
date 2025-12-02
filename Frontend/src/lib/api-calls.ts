@@ -7,12 +7,16 @@ const apiUrl = import.meta.env.VITE_API_URL
 export async function Post(url: string, data: object, navigate: any) {
     try {
         const response = await axios({ method: 'POST', url: apiUrl + url, data: data, withCredentials: true })
+        // console.log('REE: ', response)
         return response
     }
     catch (error: any) {
         const err = error
+        // console.log('ERR: ', err)
         if (err.response) {
+            // console.log('TRIGGER: 1', err.response)
             if (err.response.status < 200 || err.response.status >= 300) {
+                // console.log('TRIGGER: 2', err.response.status)
                 if (err.response.status === 403 || err.response.status === 401) {
                     navigate('/login')
                     toast.error(err.response.data.message || "Please Login Again");
@@ -28,7 +32,8 @@ export async function Post(url: string, data: object, navigate: any) {
         else {
             toast.error("Please Check Your Network")
         }
-        return null
+        // console.log('TRIGGER: 3 reeee')
+        return err.response
     }
 };
 

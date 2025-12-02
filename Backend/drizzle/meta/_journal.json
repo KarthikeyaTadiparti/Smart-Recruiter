@@ -15,6 +15,13 @@
       "when": 1764570392014,
       "tag": "0001_dazzling_epoch",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764665826564,
+      "tag": "0002_tiresome_argent",
+      "breakpoints": true
     }
   ]
 }

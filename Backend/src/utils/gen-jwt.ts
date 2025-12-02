@@ -2,8 +2,8 @@ import jwt from "jsonwebtoken";
 import { Response } from "express";
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
-export default function genJwt(res: Response, id: any) {
-    const token = jwt.sign({ id }, JWT_SECRET, { expiresIn: "30d" });
+export default function genJwt(res: Response, id: any, companyId?: number) {
+    const token = jwt.sign({ id, companyId }, JWT_SECRET, { expiresIn: "30d" });
 
     res.cookie("jwt", token, {
         httpOnly: true,
