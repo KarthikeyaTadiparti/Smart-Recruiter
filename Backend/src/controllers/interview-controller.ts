@@ -17,12 +17,13 @@ export const generateQuestions = wrapAsync(async (req: Request, res: Response) =
         interview_type,
         no_of_questions
     } = req.body;
-    const userId = parseInt(req.user!.id); 
+    const userId = parseInt(req.user!.id);
     const userCompanyId = parseInt(req.user!.companyId ?? req.body.company_id);
 
-    if (!job_role || !description || !tech_stack || !experience || !location || !closed_at || !interview_duration || !interview_type || !no_of_questions)
-        throw new ExpressError(404, "All fields are required");
-
+    if (!job_role || !description || !tech_stack || experience === undefined || !location || !closed_at || interview_duration === undefined || !interview_type || no_of_questions === undefined) 
+        throw new ExpressError(400, "All fields are required");
+    
+    // Questions Generation
     const ai = new GoogleGenAI({
         apiKey: process.env.GEMINI_API_KEY!,
     });
@@ -67,14 +68,15 @@ export const generateQuestions = wrapAsync(async (req: Request, res: Response) =
         model: "gemini-2.5-flash",
         contents: prompt,
     });
-    // console.log(response.text);
 
-    const job = await addJob(job_role,description,tech_stack,experience,location,closed_at,userId,userCompanyId);
+    // Job Creation
+    const job = await addJob(job_role, description, tech_stack, experience, location, closed_at, userId, userCompanyId);
 
-    const interview = await addInterview(interview_duration,interview_type,no_of_questions,job!.jobId);
+    // Interview Creation
+    const interview = await addInterview(interview_duration, interview_type, no_of_questions, job!.jobId);
 
     res.status(200).json({
-        success: true,
+        status: true,
         message: "Questions generated successfully",
         job,
         interview,

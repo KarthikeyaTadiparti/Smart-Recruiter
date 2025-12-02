@@ -36,7 +36,7 @@ app.get("/test", async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error("DB error:", err);
-    res.status(500).json({ success: false, error: "database error" });
+    res.status(500).json({ status: false, error: "database error" });
   }
 });
 

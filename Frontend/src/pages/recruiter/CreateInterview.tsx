@@ -33,7 +33,7 @@ export interface Job {
   closed_at: string; // "YYYY-MM-DD" or ""
   interview_duration: string;
   interview_type: string;
-  no_of_question: string;
+  no_of_questions: string;
 }
 
 function CreateInterview() {
@@ -47,7 +47,7 @@ function CreateInterview() {
       closed_at: "",
       interview_duration: "",
       interview_type: "",
-      no_of_question: "",
+      no_of_questions: "",
     },
   });
 
@@ -56,13 +56,16 @@ function CreateInterview() {
 
   const onSubmit: SubmitHandler<Job> = async (data) => {
     console.log("form submit:", data);
-    const payload = await dispatch(_generateQuestions({ data: data, navigate: navigate }))
-    console.log("payload : ", payload);
+    const { payload } = await dispatch(_generateQuestions({ data: data, navigate }));
+    //payload.data -> interview, job, questions
+    console.log("payload : ", payload.data);
 
-    // if (payload?.data?.status) {
-    //   toast.success(payload.data.message);
-    //   navigate("/interview-questions/:id")
-    // }
+    if (payload?.data?.status) {
+      toast.success(payload.data.message);
+      navigate(`/recruiter/interview-questions/${payload.data.interview.interviewId}`);
+    } else {
+      toast.error(payload?.data?.message || "Failed to create interview");
+    }
   };
 
   return (
@@ -178,7 +181,7 @@ function CreateInterview() {
               {/* No of Questions */}
               <FormField
                 control={form.control}
-                name="no_of_question"
+                name="no_of_questions"
                 render={({ field }) => (
                   <FormItem className="flex-1 space-y-2">
                     <FormLabel>No. of Questions</FormLabel>

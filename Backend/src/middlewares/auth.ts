@@ -63,7 +63,7 @@ export function ensureAuthentication(req: Request, res: Response, next: NextFunc
     try {
         const user = jwt.verify(jwtToken, process.env.JWT_SECRET!) as JwtPayload;
         req.user = user;
-        console.log("user : ",user);
+        // console.log("user : ",user);
         next();
     } catch (error) {
         throw new ExpressError(401, "Invalid token");

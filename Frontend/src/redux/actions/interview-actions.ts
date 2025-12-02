@@ -1,4 +1,4 @@
-import { GetAll, Post } from "@/lib/api-calls"
+import { Post } from "@/lib/api-calls"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
 export const _generateQuestions = createAsyncThunk<any, any>('generateQuestions', async (data: any) => {
