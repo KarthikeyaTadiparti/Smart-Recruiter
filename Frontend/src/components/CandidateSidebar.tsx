@@ -31,7 +31,7 @@ export function CandidateSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar() 
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props} className="z-110">
       <SidebarHeader className="flex flex-row justify-center items-center">
         <ArrowBigUpDash className="p-1 w-[35px] h-[35px] bg-primary text-white rounded-md" />
         {open && <h1 className="text-xl font-bold py-3 text-center">Smart Recruiter</h1>}
