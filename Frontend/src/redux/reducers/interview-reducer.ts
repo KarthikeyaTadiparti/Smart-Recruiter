@@ -1,50 +1,82 @@
-// import { createSlice } from "@reduxjs/toolkit";
-// import { _generateQuestions } from "../actions/interview-actions";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { _generateQuestions } from "@/redux/actions/interview-actions"
+import { parseQuestions } from "@/lib/utils";
 
-// interface QuestionStatusState {
-//     loading: boolean;
-//     error: string | null;
-// }
+export interface InterviewQuestion {
+    type?: string;
+    question: string;
+}
 
-// const initialState: QuestionStatusState = {
-//     loading: false,
-//     error: null,
-// };
+interface InterviewInitialStateType {
+    loading: {
+        fetch: boolean;
+    };
+    error: string | null;
+    interviewQuestions: InterviewQuestion[];
+}
 
-// const questionStatusSlice = createSlice({
-//     name: "questionStatus",
-//     initialState,
-//     reducers: {
-//         clearQuestionError(state) {
-//             state.error = null;
-//         },
-//         resetQuestionStatus(state) {
-//             state.loading = false;
-//             state.error = null;
-//         },
-//     },
-//     extraReducers: (builder) => {
-//         builder
-//             .addCase(_generateQuestions.pending, (state) => {
-//                 state.loading = true;
-//                 state.error = null;
-//             })
-//             .addCase(_generateQuestions.fulfilled, (state) => {
-//                 state.loading = false;
-//                 state.error = null;
-//             })
-//             .addCase(_generateQuestions.rejected, (state, action: any) => {
-//                 state.loading = false;
 
-//                 const message =
-//                     (action.payload && (action.payload.message ?? action.payload)) ??
-//                     action.error?.message ??
-//                     "Something went wrong";
 
-//                 state.error = typeof message === "string" ? message : JSON.stringify(message);
-//             });
-//     },
-// });
+// --- initial state ---
+const initialState: InterviewInitialStateType = {
+    loading: {
+        fetch: false,
+    },
+    error: null,
+    interviewQuestions: [],
+};
 
-// export const { clearQuestionError, resetQuestionStatus } = questionStatusSlice.actions;
-// export default questionStatusSlice.reducer;
+// --- slice ---
+const interviewSlice = createSlice({
+    name: "interviews",
+    initialState,
+    reducers: {
+        // manual setter if needed elsewhere
+        setInterviewQuestions(state, action: PayloadAction<InterviewQuestion[]>) {
+            state.interviewQuestions = action.payload;
+        },
+        clearQuestions(state) {
+            state.interviewQuestions = [];
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(_generateQuestions.pending, (state) => {
+                state.loading.fetch = true;
+                state.error = null;
+            })
+            .addCase(_generateQuestions.fulfilled, (state, action) => {
+                state.loading.fetch = false;
+                state.error = null;
+
+                const payload = action.payload;
+
+                // Try to extract the raw questions from common shapes:
+                // - axios-like: payload.data.questions OR payload.data
+                // - direct: payload.questions
+                // - sometimes payload itself is string/object
+                let rawQuestions: any = undefined;
+                if (!payload) {
+                    rawQuestions = undefined;
+                } else if (Array.isArray(payload)) {
+                    rawQuestions = payload;
+                } else if (payload.data) {
+                    rawQuestions = payload.data.questions ?? payload.data;
+                } else if (payload.questions) {
+                    rawQuestions = payload.questions;
+                } else {
+                    rawQuestions = payload;
+                }
+
+                state.interviewQuestions = parseQuestions(rawQuestions);
+            })
+            .addCase(_generateQuestions.rejected, (state, action) => {
+                state.loading.fetch = false;
+                state.error = action.error?.message ?? "Failed to generate questions";
+            });
+    },
+});
+
+
+export const { setInterviewQuestions } = interviewSlice.actions;
+export default interviewSlice.reducer

@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { GoogleGenAI } from "@google/genai";
 import ExpressError from "../middlewares/errorhandler.ts";
 import { addJob } from "../services/jobs-services.ts";
-import { addInterview } from "../services/interviews-services.ts";
+import { addInterview, addQuestions } from "../services/interviews-services.ts";
 
 
 export const generateQuestions = wrapAsync(async (req: Request, res: Response) => {
@@ -20,9 +20,9 @@ export const generateQuestions = wrapAsync(async (req: Request, res: Response) =
     const userId = parseInt(req.user!.id);
     const userCompanyId = parseInt(req.user!.companyId ?? req.body.company_id);
 
-    if (!job_role || !description || !tech_stack || experience === undefined || !location || !closed_at || interview_duration === undefined || !interview_type || no_of_questions === undefined) 
+    if (!job_role || !description || !tech_stack || experience === undefined || !location || !closed_at || interview_duration === undefined || !interview_type || no_of_questions === undefined)
         throw new ExpressError(400, "All fields are required");
-    
+
     // Questions Generation
     const ai = new GoogleGenAI({
         apiKey: process.env.GEMINI_API_KEY!,
@@ -82,4 +82,17 @@ export const generateQuestions = wrapAsync(async (req: Request, res: Response) =
         interview,
         questions: response.text,
     });
+});
+
+
+export const addInterviewQuestions = wrapAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const interviewId = Number(id);
+    const questions = req.body;
+
+    console.log("Questions : ", questions);
+    console.log("interview Id", id);
+
+    const updatedInterview = await addQuestions(interviewId, questions);
+    return res.status(200).json({ status: true, data: updatedInterview });
 });

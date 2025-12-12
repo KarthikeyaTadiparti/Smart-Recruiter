@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import DatePickerButtonRHF from "@/components/DatePickerButtonRHF";
 
+
 export interface Job {
   job_role: string;
   description: string;
@@ -56,17 +57,26 @@ function CreateInterview() {
 
   const onSubmit: SubmitHandler<Job> = async (data) => {
     console.log("form submit:", data);
-    const { payload } = await dispatch(_generateQuestions({ data: data, navigate }));
-    //payload.data -> interview, job, questions
-    console.log("payload : ", payload.data);
 
-    if (payload?.data?.status) {
-      toast.success(payload.data.message);
-      navigate(`/recruiter/interview-questions/${payload.data.interview.interviewId}`);
-    } else {
-      toast.error(payload?.data?.message || "Failed to create interview");
+    try {
+      const { payload } = await dispatch(_generateQuestions({ data, navigate }));
+
+      console.log("payload : ", payload?.data);
+
+      if (payload?.data?.status) {
+        toast.success(payload.data.message);
+        navigate(`/recruiter/interview-questions/${payload.data.interview.interviewId}`);
+      }
+      else {
+        toast.error(payload?.data?.message || "Failed to create interview");
+      }
+    } catch (err) {
+      console.error("generateQuestions error:", err);
+      toast.error("Something went wrong. Please try again.");
     }
   };
+
+
 
   return (
     <main className="flex flex-1 flex-col gap-4 relative p-4">
