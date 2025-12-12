@@ -4,10 +4,8 @@ export default class ExpressError extends Error {
     status: number;
 
     constructor(status: number, message: string) {
-        super(message);                   
+        super(message);
         this.status = status;
-
-        Object.setPrototypeOf(this, ExpressError.prototype);
     }
 }
 

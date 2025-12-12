@@ -3,7 +3,7 @@ import { addCompany } from "../services/companies-services.ts";
 import { Request, Response } from "express";
 
 export const createCompany = wrapAsync(async (req: Request, res: Response) => {
-    const userId = parseInt(req.user!.id);
+    const userId = Number(req.user!.id);
     const { name, description, website } = req.body;
     const company = await addCompany(name, description, website, userId);
 

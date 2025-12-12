@@ -2,6 +2,7 @@ import db from "../config/db.ts";
 import { eq, sql } from "drizzle-orm";
 import { interviews } from "../schema/interviews-schema.ts";
 import { Question } from "../types/interview.ts";
+import ExpressError from "../middlewares/errorhandler.ts";
 
 export async function addInterview(interview_duration: string, interview_type: string, no_of_questions: string, jobId: number) {
     const [interview] = await db.insert(interviews).values({
@@ -14,13 +15,12 @@ export async function addInterview(interview_duration: string, interview_type: s
 }
 
 
-
 export async function addQuestions(interviewId: number, questions: Question[]) {
     if (!Number.isInteger(interviewId) || interviewId <= 0)
-        throw new TypeError("interviewId must be a positive integer");
+        throw new ExpressError(400, "interviewId must be a positive integer");
 
     if (!Array.isArray(questions))
-        throw new TypeError("questions must be an array");
+        throw new ExpressError(400, "questions must be an array");
 
     const [updated] = await db
         .update(interviews)
@@ -32,7 +32,7 @@ export async function addQuestions(interviewId: number, questions: Question[]) {
         .returning();
 
     if (!Array.isArray(updated) || updated.length === 0) {
-        throw new Error(`Interview with id ${interviewId} not found`);
+        throw new ExpressError(404, `Interview with id ${interviewId} not found`);
     }
 
     return updated;

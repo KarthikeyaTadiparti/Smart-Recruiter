@@ -6,7 +6,7 @@ import { addJob } from "../services/jobs-services.ts";
 import { addInterview, addQuestions } from "../services/interviews-services.ts";
 
 
-export const generateQuestions = wrapAsync(async (req: Request, res: Response) => {
+export const generateInterviewQuestions = wrapAsync(async (req: Request, res: Response) => {
     const { job_role,
         description,
         tech_stack,
@@ -17,8 +17,8 @@ export const generateQuestions = wrapAsync(async (req: Request, res: Response) =
         interview_type,
         no_of_questions
     } = req.body;
-    const userId = parseInt(req.user!.id);
-    const userCompanyId = parseInt(req.user!.companyId ?? req.body.company_id);
+    const userId = Number(req.user!.id);
+    const userCompanyId = Number(req.user!.companyId ?? req.body.company_id);
 
     if (!job_role || !description || !tech_stack || experience === undefined || !location || !closed_at || interview_duration === undefined || !interview_type || no_of_questions === undefined)
         throw new ExpressError(400, "All fields are required");
