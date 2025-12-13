@@ -1,14 +1,9 @@
-// import wrapAsync from "../utils/wrap-async.ts";
-// import { Request, Response } from "express";
+import { fetchAllJobs } from "../services/jobs-services.ts";
+import wrapAsync from "../utils/wrap-async.ts";
+import { Request, Response } from "express";
 
-// export const createJob = wrapAsync(async (req: Request, res: Response) => {
-//     const userId = parseInt(req.user!.id);
-//     const { title, description, location, company } = req.body;
-//     const job = await addJob(title, description, location, company, userId);
+export const getAllJobs = wrapAsync(async (req: Request, res: Response) => {
+    const jobs = await fetchAllJobs();
 
-//     return res.status(200).json({
-//         status: true,
-//         job: job,
-//         message: "Job created successfully!"
-//     });
-// })
+    return res.status(200).json({ jobs });
+})

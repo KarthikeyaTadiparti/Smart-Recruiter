@@ -1,9 +1,9 @@
-import {Router } from "express";
+import { Router } from "express";
 import { ensureAuthentication } from "../middlewares/auth.ts";
-// import { createJob } from "../controllers/jobs-controller.ts";
+import { getAllJobs } from "../controllers/job-controller.ts";
 
 const jobRouter = Router();
 
-// jobRouter.post("/", ensureAuthentication,createJob);
+jobRouter.get("/", getAllJobs);
 
 export default jobRouter;
