@@ -2,10 +2,10 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import { Code, FolderOpen, HelpCircle, Lightbulb, Pencil, Trash2, UserRound } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { InterviewQuestion } from "@/redux/reducers/interview-reducer";
+import { JobQuestion } from "@/redux/reducers/job-reducer";
 import type { RootState } from "@/redux/store";
 import { toast } from "sonner";
-import { _createInterview } from "@/redux/actions/interview-actions";
+import { _createJob } from "@/redux/actions/job-actions";
 
 const getQuestionStyles = (typeString?: string) => {
     const type = (typeString || "").toLowerCase();
@@ -25,13 +25,13 @@ const InterviewQuestions: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
 
-    const interviewQuestions = useAppSelector((state: RootState) => state.interview.interviewQuestions);
-    const questions = Array.isArray(interviewQuestions) ? interviewQuestions : [];
+    const jobQuestions = useAppSelector((state: RootState) => state.job.jobQuestions);
+    const questions = Array.isArray(jobQuestions) ? jobQuestions : [];
 
 
     const handleCreateInterview = async () => {
         try {
-            const { payload } = await dispatch(_createInterview({ questions, id, navigate }));
+            const { payload } = await dispatch(_createJob({ questions, id, navigate }));
 
             console.log("payload : ",payload);
 
@@ -56,7 +56,7 @@ const InterviewQuestions: React.FC = () => {
 
             <div className="space-y-4">
                 {questions.length > 0 ? (
-                    questions.map((item: InterviewQuestion, index: number) => {
+                    questions.map((item: JobQuestion, index: number) => {
                         const { badge, Icon } = getQuestionStyles(item.type);
                         const key = (item as any).id ?? `${index}-${item.question?.slice(0, 20)}`;
 

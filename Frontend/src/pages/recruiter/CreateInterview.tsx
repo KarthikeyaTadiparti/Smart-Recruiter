@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useAppDispatch } from "@/hooks/use-redux";
-import { _generateQuestions } from "@/redux/actions/interview-actions";
+import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
+import { _generateQuestions } from "@/redux/actions/job-actions";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,6 +51,8 @@ function CreateInterview() {
       no_of_questions: "",
     },
   });
+  const { userData } = useAppSelector((state) => state.auth);
+  const company = userData.company;
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -59,13 +61,13 @@ function CreateInterview() {
     console.log("form submit:", data);
 
     try {
-      const { payload } = await dispatch(_generateQuestions({ data, navigate }));
+      const { payload } = await dispatch(_generateQuestions({data: {...data,companyId: company.id}, navigate}));
 
       console.log("payload : ", payload?.data);
 
       if (payload?.data?.status) {
         toast.success(payload.data.message);
-        navigate(`/recruiter/interview-questions/${payload.data.interview.interviewId}`);
+        navigate(`/recruiter/interview-questions/${payload.data.job.jobId}`);
       }
       else {
         toast.error(payload?.data?.message || "Failed to create interview");

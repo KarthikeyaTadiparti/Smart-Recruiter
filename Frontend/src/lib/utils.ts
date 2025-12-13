@@ -1,4 +1,4 @@
-import { InterviewQuestion } from "@/redux/reducers/interview-reducer";
+import { InterviewQuestion } from "@/redux/reducers/job-reducer";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 

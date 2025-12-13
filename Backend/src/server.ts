@@ -9,7 +9,6 @@ import jobRoutes from "./routes/job-routes.ts";
 import morganMiddleware from "./config/morgan.ts";
 import db from "./config/db.ts";
 import { users } from "./schema/users-schema.ts";
-import interviewRoutes from "./routes/interview-routes.ts";
 
 const app = express();
 const { PORT, APP_URL } = process.env;
@@ -28,7 +27,6 @@ app.use(cookieParser());
 app.use('/auth',authRoutes);
 app.use('/companies',companyRoutes);
 app.use('/jobs',jobRoutes);
-app.use('/interviews',interviewRoutes);
 
 app.get("/test", async (req, res) => {
   try {

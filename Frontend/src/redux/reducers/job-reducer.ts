@@ -1,44 +1,36 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { _generateQuestions } from "@/redux/actions/interview-actions"
+import { createSlice } from "@reduxjs/toolkit";
+import { _generateQuestions } from "@/redux/actions/job-actions"
 import { parseQuestions } from "@/lib/utils";
 
-export interface InterviewQuestion {
+export interface JobQuestion {
     type?: string;
     question: string;
 }
 
-interface InterviewInitialStateType {
+interface JobInitialStateType {
     loading: {
         fetch: boolean;
     };
     error: string | null;
-    interviewQuestions: InterviewQuestion[];
+    jobQuestions: JobQuestion[];
 }
 
 
 
 // --- initial state ---
-const initialState: InterviewInitialStateType = {
+const initialState: JobInitialStateType = {
     loading: {
         fetch: false,
     },
     error: null,
-    interviewQuestions: [],
+    jobQuestions: [],
 };
 
 // --- slice ---
-const interviewSlice = createSlice({
-    name: "interviews",
+const jobSlice = createSlice({
+    name: "jobs",
     initialState,
-    reducers: {
-        // manual setter if needed elsewhere
-        setInterviewQuestions(state, action: PayloadAction<InterviewQuestion[]>) {
-            state.interviewQuestions = action.payload;
-        },
-        clearQuestions(state) {
-            state.interviewQuestions = [];
-        },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(_generateQuestions.pending, (state) => {
@@ -68,7 +60,7 @@ const interviewSlice = createSlice({
                     rawQuestions = payload;
                 }
 
-                state.interviewQuestions = parseQuestions(rawQuestions);
+                state.jobQuestions = parseQuestions(rawQuestions);
             })
             .addCase(_generateQuestions.rejected, (state, action) => {
                 state.loading.fetch = false;
@@ -78,5 +70,4 @@ const interviewSlice = createSlice({
 });
 
 
-export const { setInterviewQuestions } = interviewSlice.actions;
-export default interviewSlice.reducer
+export default jobSlice.reducer

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   Building2,
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAppDispatch } from "@/hooks/use-redux";
-import { _getAllJobs } from "@/redux/actions/interview-actions";
+import { _getAllJobs } from "@/redux/actions/job-actions";
 import { useNavigate } from "react-router-dom";
 
 /* ===============================
@@ -88,7 +88,7 @@ function Explore() {
       {/* Header */}
       <div className="mt-4">
         <h1 className="text-xl font-semibold">Explore Jobs</h1>
-        <p className="text-slate-500">
+        <p className="text-muted-foreground">
           Find interviews and hiring challenges from companies
         </p>
       </div>
