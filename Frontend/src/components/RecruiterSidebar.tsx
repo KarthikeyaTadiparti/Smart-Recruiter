@@ -50,7 +50,7 @@ const items = [
 export function RecruiterSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { pathname } = useLocation()
   const { userData } = useAppSelector((state) => state.auth);
-  const user = userData?.data?.user;
+  const user = userData;
   const { open } = useSidebar() 
 
 

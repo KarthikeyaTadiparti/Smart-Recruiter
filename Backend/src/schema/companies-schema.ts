@@ -6,7 +6,6 @@ export const companies = pgTable("companies", {
     name: varchar("name", { length: 100 }).notNull(),
     description: text("description").notNull(),
     website: varchar("website", { length: 255 }).notNull(),
-    createdBy: integer("created_by").notNull().references(() => users.id),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

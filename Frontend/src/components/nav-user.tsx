@@ -33,15 +33,7 @@ import { useNavigate } from "react-router-dom"
 import { _userLogout } from "@/redux/actions/auth-actions"
 import { toast } from "sonner"
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
+export function NavUser({ user }: { user: any }) {
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()

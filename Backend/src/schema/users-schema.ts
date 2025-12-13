@@ -5,7 +5,9 @@ import {
   varchar,
   text,
   timestamp,
+  integer,
 } from "drizzle-orm/pg-core";
+import { companies } from "./companies-schema.ts";
 
 export const userRoleEnum = pgEnum("user_role", ["candidate", "recruiter"]);
 
@@ -15,6 +17,7 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: text("password").notNull(),
   role: userRoleEnum("role").notNull().default("candidate"),
+  companyId: integer("company_id").references(() => companies.companyId),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

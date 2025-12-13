@@ -7,9 +7,16 @@ export const createCompany = wrapAsync(async (req: Request, res: Response) => {
     const { name, description, website } = req.body;
     const company = await addCompany(name, description, website, userId);
 
+    const responseCompany = {
+        id : company.companyId,
+        name : company.name,
+        description : company.description,
+        website : company.website
+    }
+
     return res.status(200).json({
         status: true,
-        company: company,
+        company: responseCompany,
         message: "Company created successfully!"
     });
 });

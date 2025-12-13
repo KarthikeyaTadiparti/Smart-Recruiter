@@ -48,7 +48,7 @@ const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
 const ProtectedAuthRoute = ({ element }: { element: React.ReactNode }) => {
   const { userData } = useAppSelector((state) => state.auth);
   if (userData) {
-    const role = userData?.data?.user?.role;
+    const role = userData.role;
     if (role === "candidate") {
       return <Navigate to="/candidate" replace />;
     }
@@ -66,8 +66,8 @@ function App() {
   const { userData } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    console.log("user data : ", userData?.data?.user);
-    console.log("company details : ", userData?.data?.company);
+    console.log("user data : ", userData);
+    console.log("company details : ", userData.company);
   }, [userData]);
 
   return (

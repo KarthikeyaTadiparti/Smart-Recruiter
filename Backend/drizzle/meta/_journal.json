@@ -29,6 +29,13 @@
       "when": 1765514977622,
       "tag": "0003_shiny_greymalkin",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1765594093531,
+      "tag": "0004_absurd_earthquake",
+      "breakpoints": true
     }
   ]
 }

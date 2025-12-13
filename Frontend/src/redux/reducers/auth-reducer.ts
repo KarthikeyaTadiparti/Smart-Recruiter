@@ -5,19 +5,43 @@ interface AuthInitialStateType {
     loading: {
         login: boolean,
         signup: boolean,
-        logout: boolean
+        logout: boolean,
+        fetchCompany: boolean
     },
     error: string | null,
-    userData: any | null
+    userData: {
+        id: number | null
+        name: string | null
+        email: string | null
+        role: string | null
+        company: {
+            id: number | null,
+            name: string | null,
+            website: string | null,
+            description: string | null,
+        }
+    }
 }
 const initialState: AuthInitialStateType = {
     loading: {
         login: false,
         signup: false,
-        logout: false
+        logout: false,
+        fetchCompany: false
     },
     error: null,
-    userData: null
+    userData: {
+        id: null,
+        name: null,
+        email: null,
+        role: null,
+        company: {
+            id: null,
+            name: null,
+            website: null,
+            description: null
+        }
+    }
 }
 const authSlice = createSlice({
     name: 'auth',
@@ -32,7 +56,7 @@ const authSlice = createSlice({
             .addCase(_userLogin.fulfilled, (state, action) => {
                 state.loading.login = false
                 // console.log("action.payload : ", action.payload);
-                state.userData = action.payload
+                state.userData = action.payload.data.user;
             })
             .addCase(_userLogin.rejected, (state, action) => {
                 state.loading.login = false
@@ -44,7 +68,7 @@ const authSlice = createSlice({
             })
             .addCase(_userSignup.fulfilled, (state, action) => {
                 state.loading.signup = false
-                state.userData = action.payload
+                state.userData = action.payload.data.user
             })
             .addCase(_userSignup.rejected, (state, action) => {
                 state.loading.signup = false
@@ -56,16 +80,25 @@ const authSlice = createSlice({
             })
             .addCase(_userLogout.fulfilled, (state) => {
                 state.loading.logout = false
-                state.userData = null
+                state.userData = initialState.userData
             })
             .addCase(_userLogout.rejected, (state, action) => {
                 state.loading.logout = false
                 state.error = action.error.message || "Please Try Again"
             })
+
+            //fetch company
+            .addCase(_createCompany.pending, (state) => {
+                state.loading.fetchCompany = true
+            })
             .addCase(_createCompany.fulfilled, (state, action) => {
-                if (state.userData?.data && action.payload?.data?.company) {
-                    state.userData.data.company = action.payload.data.company
-                }
+                state.loading.fetchCompany = false
+                state.userData.company = action.payload.data.company
+            })
+            .addCase(_createCompany.rejected, (state,action) => {
+                state.loading.fetchCompany = false
+                state.error = action.error.message || "Please Try Again"
+
             })
     },
 })

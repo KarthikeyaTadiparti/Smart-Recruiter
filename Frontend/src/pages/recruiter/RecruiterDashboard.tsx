@@ -1,4 +1,3 @@
-// RecruiterDashboard.tsx
 import React, { useEffect, useState, FormEvent } from "react";
 import {
   Card,
@@ -86,8 +85,10 @@ const recentInterviews = [
 export default function RecruiterDashboard() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const userData = useAppSelector((state) => state.auth.userData?.data?.user);
-  const company = useAppSelector((state) => state.auth.userData?.data?.company);
+  const authData = useAppSelector((state) => state.auth)
+  const loading = authData.loading.fetchCompany;
+  const userData = authData.userData;
+  const company = userData.company;
 
   const [showCompanyDialog, setShowCompanyDialog] = useState(false);
   const [companyForm, setCompanyForm] = useState({
@@ -95,10 +96,9 @@ export default function RecruiterDashboard() {
     description: "",
     website: "",
   });
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (userData?.role === "recruiter" && !company) {
+    if (userData?.role === "recruiter" && !company?.id) {
       setShowCompanyDialog(true);
     }
   }, [userData, company]);
@@ -106,12 +106,14 @@ export default function RecruiterDashboard() {
   async function handleCompanySubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!companyForm.name || !companyForm.description || !companyForm.website) return;
-    setSubmitting(true);
     const { payload }: any = await dispatch(_createCompany({ data: companyForm, navigate }));
-    setSubmitting(false);
+
     if (payload?.data?.status) {
       toast.success(payload.data.message);
       setShowCompanyDialog(false);
+    }
+    else {
+      toast.error(payload?.data?.message || "Failed to create interview");
     }
   }
   return (
@@ -170,8 +172,8 @@ export default function RecruiterDashboard() {
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
-                <Button type="submit" disabled={submitting}>
-                  {submitting ? "Saving..." : "Save"}
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : "Save"}
                 </Button>
               </div>
             </form>

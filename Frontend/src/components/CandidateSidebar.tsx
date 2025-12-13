@@ -27,7 +27,7 @@ const items = [
 export function CandidateSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { pathname } = useLocation()
   const { userData } = useAppSelector((state) => state.auth)
-  const user = userData?.data?.user
+  const user = userData;
   const { open } = useSidebar() 
 
   return (

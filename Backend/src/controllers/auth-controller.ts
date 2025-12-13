@@ -3,41 +3,40 @@ import bcrypt from "bcrypt";
 import ExpressError from "../middlewares/errorhandler.ts";
 import genJwt from "../utils/gen-jwt.ts";
 import wrapAsync from "../utils/wrap-async.ts";
-import { createUser, getAllUsers, getUserByEmailAndRole } from "../services/users-services.ts";
-import { getCompany } from "../services/companies-services.ts";
+import { createUser, getAllUsers, getRecruiterCompany, getUserByEmailAndRole } from "../services/users-services.ts";
 
 // Signup
 export const handleUserSignup = wrapAsync(async (req: Request, res: Response) => {
     const { name, email, password, role } = req.body;
 
-    const user = await getUserByEmailAndRole(email, role);
-    if (user)
+    const existingUser = await getUserByEmailAndRole(email, role);
+    if (existingUser) {
         throw new ExpressError(409, "User already exists!");
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await createUser (name,email,hashedPassword,role);
+    const newUser = await createUser(name, email, hashedPassword, role);
 
-    if (!newUser || !newUser.id) 
+    if (!newUser?.id) {
         throw new ExpressError(500, "Failed to create user");
-
-    let company;
-    if(newUser.role === "recruiter"){
-        company = await getCompany(newUser.id);
     }
-    const id = newUser.id;
-    const companyId = company?.companyId;
-    genJwt(res, id, companyId);
 
-    return res.status(200).json({
-        status: true,
-        user: {
-            id: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
-            role: newUser.role
+    let responseUser = {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        company: {
+            id: null,
         },
-        company : company ? company : null,
-        message: "User registered successfully!"
+    };
+
+    genJwt(res, newUser.id);
+
+    return res.status(201).json({
+        status: true,
+        user: responseUser,
+        message: "User registered successfully!",
     });
 });
 
@@ -53,23 +52,27 @@ export const handleUserLogin = wrapAsync(async (req: Request, res: Response) => 
     if (!isPassword)
         throw new ExpressError(403, "Invalid email or password!");
 
-    let company;
-    if(user.role === "recruiter"){
-        company = await getCompany(user.id);
+    let responseUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        company: {
+            id: user.companyId,
+        }
+    };
+
+    if (user.role === "recruiter") {
+        const recruiterCompany = await getRecruiterCompany(user.id);
+        if (recruiterCompany)
+            responseUser = recruiterCompany;
     }
-    const id = user.id;
-    const companyId = company?.companyId;
-    genJwt(res, id, companyId);
+
+    genJwt(res, user.id);
 
     return res.status(200).json({
         status: true,
-        user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role
-        },
-        company : company ?? null,
+        user: responseUser,
         message: "User logged in successfully!"
     });
 });
