@@ -1,4 +1,4 @@
-import { Post, Patch, GetAll } from "@/lib/api-calls"
+import { Post, Patch, GetAll, Get } from "@/lib/api-calls"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
 export const _generateQuestions = createAsyncThunk<any, any>('generateQuestions', async (data: any) => {
@@ -15,3 +15,8 @@ export const _getAllJobs = createAsyncThunk<any, any>("getAllJobs", async (data:
     const response: any = await GetAll(`/jobs`, data.navigate);
     return response;
 });
+
+export const _getJob = createAsyncThunk<any, any>("getJob", async (data: any) => {
+    const response: any = await Get(`/jobs/`, data.id, data.navigate);
+    return response;
+})

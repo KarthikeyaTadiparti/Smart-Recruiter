@@ -83,6 +83,12 @@ function Explore() {
     fetchJobs();
   }, [dispatch]);
 
+
+  const handleNavigation = (jobId: number) => {
+    navigate(`/candidate/explore/${jobId}`);
+  };
+
+
   return (
     <div className="flex flex-1 flex-col gap-4">
       {/* Header */}
@@ -190,6 +196,7 @@ function Explore() {
               {/* CTA */}
               <Button
                 disabled={closed}
+                onClick={() => handleNavigation(job.jobId)}
                 className={`mt-6 w-full gap-2 ${closed
                   ? "bg-slate-200 text-slate-500 cursor-not-allowed"
                   : "bg-slate-950 hover:bg-slate-800"
@@ -201,8 +208,8 @@ function Explore() {
             </div>
           );
         })}
-      </section>
-    </div>
+      </section >
+    </div >
   );
 }
 

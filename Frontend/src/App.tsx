@@ -17,6 +17,7 @@ import Test from "./pages/Test";
 import Cam from "./pages/Cam";
 import VapiWidget from "./pages/VapiWidget";
 import InterviewQuestions from "./pages/recruiter/InterviewQuestions";
+import Job from "./pages/candidate/Job";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
@@ -94,6 +95,7 @@ function App() {
         <Route path="/candidate" element={<ProtectedRoute element={<Layout />} />}>
           <Route index element={<CandidateDashboard />} />
           <Route path="explore" element={<Explore />} />
+          <Route path="explore/:id" element={<Job />} />
           <Route path="my-interviews" element={<MyInterviews />} />
         </Route>
 

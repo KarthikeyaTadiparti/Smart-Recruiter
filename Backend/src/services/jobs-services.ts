@@ -4,6 +4,7 @@ import { jobs } from "../schema/jobs-schema.ts";
 import { companies } from "../schema/companies-schema.ts";
 import ExpressError from "../middlewares/errorhandler.ts";
 import { Question } from "../types/interview.ts";
+import { users } from "../schema/users-schema.ts";
 
 export async function addJob(
     job_role: string,
@@ -82,4 +83,36 @@ export async function fetchAllJobs() {
         );
 
     return allJobs;
+}
+
+export async function fetchJobs(id: number) {
+    const [job] = await db
+        .select({
+            //job
+            jobId: jobs.jobId,
+            jobRole: jobs.jobRole,
+            description: jobs.description,
+            techStack: jobs.techStack,
+            experience: jobs.experience,
+            location: jobs.location,
+            closedAt: jobs.closedAt,
+            interviewType: jobs.interviewType,
+            interviewDuration: jobs.interviewDuration,
+            noOfQuestions: jobs.noOfQuestions,
+
+            //company
+            comapnyName: companies.name,
+            companyDescription: companies.description,
+            website: companies.website,
+
+            //recruiter
+            recruiterName: users.name,
+            email: users.email,
+        })
+        .from(jobs)
+        .innerJoin(companies, eq(companies.companyId, jobs.companyId))
+        .innerJoin(users, eq(users.id, jobs.recruiterId))
+        .where(eq(jobs.jobId, id));
+
+    return job;
 }

@@ -1,4 +1,4 @@
-import { fetchAllJobs } from "../services/jobs-services.ts";
+import { fetchAllJobs, fetchJobs } from "../services/jobs-services.ts";
 import wrapAsync from "../utils/wrap-async.ts";
 import { Request, Response } from "express";
 import { GoogleGenAI } from "@google/genai";
@@ -73,16 +73,16 @@ export const generateInterviewQuestions = wrapAsync(async (req: Request, res: Re
 
     // Job Creation
     const job = await addJob(
-        job_role, 
-        description, 
-        tech_stack, 
-        experience, 
-        location, 
-        closed_at, 
-        userId, 
-        companyIdNum, 
-        interview_duration, 
-        interview_type, 
+        job_role,
+        description,
+        tech_stack,
+        experience,
+        location,
+        closed_at,
+        userId,
+        companyIdNum,
+        interview_duration,
+        interview_type,
         no_of_questions
     );
 
@@ -112,3 +112,11 @@ export const getAllJobs = wrapAsync(async (req: Request, res: Response) => {
 
     return res.status(200).json({ jobs });
 })
+
+export const getJob = wrapAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const jobId = Number(id);
+
+    const job = await fetchJobs(jobId);
+    return res.status(200).json({ job });
+});
