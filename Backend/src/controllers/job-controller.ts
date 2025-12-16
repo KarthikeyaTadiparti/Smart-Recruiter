@@ -94,7 +94,6 @@ export const generateInterviewQuestions = wrapAsync(async (req: Request, res: Re
     });
 });
 
-
 export const addInterviewQuestions = wrapAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const jobId = Number(id);
@@ -104,13 +103,13 @@ export const addInterviewQuestions = wrapAsync(async (req: Request, res: Respons
     console.log("interview Id", id);
 
     const updatedInterview = await addQuestions(jobId, questions);
-    return res.status(200).json({ status: true, data: updatedInterview });
+    return res.status(200).json({ status: true, message: "Job created successfully!", updatedInterview });
 });
 
 export const getAllJobs = wrapAsync(async (req: Request, res: Response) => {
     const jobs = await fetchAllJobs();
 
-    return res.status(200).json({ jobs });
+    return res.status(200).json({ status: true, jobs });
 })
 
 export const getJob = wrapAsync(async (req: Request, res: Response) => {
@@ -118,5 +117,5 @@ export const getJob = wrapAsync(async (req: Request, res: Response) => {
     const jobId = Number(id);
 
     const job = await fetchJobs(jobId);
-    return res.status(200).json({ job });
+    return res.status(200).json({ status: true, job });
 });

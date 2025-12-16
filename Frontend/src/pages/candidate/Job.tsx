@@ -75,6 +75,9 @@ function Job() {
         fetchJob();
     }, []);
 
+    const handleNavigation = (jobId: number) => {
+        navigate(`/interviews/${jobId}`);
+    }
 
     const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value }) => (
         <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
@@ -202,7 +205,8 @@ function Job() {
 
                     {/* Join Button (Sticky on Mobile) */}
                     <div className="sticky bottom-4 md:static">
-                        <button className="w-full bg-black hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                        <button onClick={() => handleNavigation(job.jobId)}
+                            className="w-full bg-black hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-transform transform hover:-translate-y-1 flex items-center justify-center gap-2">
                             Join Interview Session
                             <ChevronRight size={20} />
                         </button>

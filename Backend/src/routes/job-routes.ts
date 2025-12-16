@@ -4,8 +4,8 @@ import { addInterviewQuestions, generateInterviewQuestions, getAllJobs, getJob }
 
 const jobRouter = Router();
 
-jobRouter.get("/", getAllJobs);
-jobRouter.get("/:id",getJob);
+jobRouter.get("/", ensureAuthentication, getAllJobs);
+jobRouter.get("/:id", ensureAuthentication, getJob);
 jobRouter.post("/generate", ensureAuthentication, generateInterviewQuestions);
 jobRouter.patch("/:id", ensureAuthentication, addInterviewQuestions);
 

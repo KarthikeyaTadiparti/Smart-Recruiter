@@ -116,3 +116,19 @@ export async function fetchJobs(id: number) {
 
     return job;
 }
+
+export async function fetchInterviewQuestions(id : number){
+    const [job] = await db
+        .select({
+            jobId: jobs.jobId,
+            jobRole: jobs.jobRole,
+            interviewType: jobs.interviewType,
+            interviewDuration: jobs.interviewDuration,
+            questions: jobs.questions,
+            noOfQuestions: jobs.noOfQuestions,
+        })
+        .from(jobs)
+        .where(eq(jobs.jobId, id));
+
+    return job;
+}
