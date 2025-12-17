@@ -55,7 +55,6 @@ const authSlice = createSlice({
             })
             .addCase(_userLogin.fulfilled, (state, action) => {
                 state.loading.login = false
-                // console.log("action.payload : ", action.payload);
                 state.userData = action.payload.data.user;
             })
             .addCase(_userLogin.rejected, (state, action) => {

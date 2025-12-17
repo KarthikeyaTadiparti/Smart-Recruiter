@@ -1,0 +1,1 @@
+export type ViolationType = "TAB_SWITCH" | "FULLSCREEN_EXIT" | null;

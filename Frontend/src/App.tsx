@@ -15,7 +15,7 @@ import Explore from "./pages/candidate/Explore";
 import MyInterviews from "./pages/candidate/MyInterviews";
 import Test from "./pages/Test";
 import Cam from "./pages/Cam";
-import VapiWidget from "./pages/VapiWidget";
+// import VapiWidget from "./pages/VapiWidget";
 import InterviewQuestions from "./pages/recruiter/InterviewQuestions";
 import Job from "./pages/candidate/Job";
 import Interview from "./pages/candidate/Interview";
@@ -83,7 +83,7 @@ function App() {
         <Route path="/signup" element={<ProtectedAuthRoute element={<Signup />} />} />
         <Route path="/test" element={<Test />} />
         <Route path="/cam" element={<Cam />} />
-        <Route path="/vapi" element={<VapiWidget />} />
+        {/* <Route path="/vapi" element={<VapiWidget />} /> */}
 
         <Route path="/interviews/:id" element={<Interview />} />
 
