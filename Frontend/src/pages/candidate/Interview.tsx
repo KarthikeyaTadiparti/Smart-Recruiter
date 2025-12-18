@@ -1,57 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import LogDialog from '@/components/LogDialog';
 import StartScreen from '@/components/StartScreen';
 import EndScreen from '@/components/EndScreen';
 import InterviewHeader from '@/components/InterviewHeader';
 import InterviewContent from '@/components/InterviewContent';
+
 import { useCamera } from '@/hooks/useCamera';
 import { useInterviewTimer } from '@/hooks/useInterviewTimer';
 import { useProctoring } from '@/hooks/useProctoring';
 import { useVapi } from '@/hooks/useVapi';
-import { useAppSelector } from '@/hooks/use-redux';
 
-// Mock Data from the prompt
-const API_RESPONSE = {
-    status: true,
-    message: "Your interview has started",
-    interview: {
-        jobId: 16,
-        jobRole: "Full Stack Developer",
-        interviewType: "technical",
-        interviewDuration: 5, // in minutes
-        questions: [
-            {
-                type: "technical",
-                question: "In React, explain the difference between state and props. How do you manage component-specific data using the `useState` hook?"
-            },
-            {
-                type: "technical",
-                question: "Describe the role of `middleware` in an Express.js application. Can you give an example of a common use case for middleware, such as logging or authentication?"
-            },
-            {
-                type: "technical",
-                question: "When working with MongoDB, what are collections and documents? How do they conceptually relate to tables and rows in a relational database?"
-            },
-            {
-                type: "technical",
-                question: "How would you typically make an API call from your React frontend to your Express.js backend to fetch data? Briefly explain the steps involved, including what happens on both the client and server sides."
-            },
-            {
-                type: "scenario-based",
-                question: "You've deployed a MERN stack application, and users report that a specific feature is occasionally failing to save data to the database, though it works most of the time. What steps would you take to diagnose and debug this intermittent issue, starting from the frontend to the backend and database?"
-            }
-        ],
-        noOfQuestions: 5
-    }
-};
+import { useAppDispatch, useAppSelector } from '@/hooks/use-redux';
+import { _getInterview } from '@/redux/actions/interview-actions';
+import { interview as InterviewType } from '@/types/types';
 
 export default function Interview() {
-    // Global States
-    const userData = useAppSelector((state) => state.auth.userData)
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
 
-    // Local States
+    const userData = useAppSelector((state) => state.auth.userData);
+    const dispatch = useAppDispatch();
+
     const [started, setStarted] = useState(false);
     const [ended, setEnded] = useState(false);
+    const [interview, setInterview] = useState<InterviewType | null>(null);
 
     const [isMicOn, setIsMicOn] = useState(true);
     const [isVideoOn, setIsVideoOn] = useState(true);
@@ -59,22 +33,43 @@ export default function Interview() {
 
     const { videoRef, error } = useCamera(started, ended, setIsVideoOn);
     const { tabSwitches, violation, setViolation, enterFullscreen } = useProctoring(started, ended);
-    const { timeLeft } = useInterviewTimer(started, ended, setEnded, API_RESPONSE.interview.interviewDuration);
+    const { timeLeft } = useInterviewTimer(started, ended, setEnded, interview?.interviewDuration ?? 0);
 
     const { startVapi, stopVapi } = useVapi();
 
-    // --- helper functions ---
+    useEffect(() => {
+        const fetchInterview = async () => {
+            const { payload } = await dispatch(
+                _getInterview({ id: Number(id), navigate })
+            );
+
+            const interviewData = payload?.data?.interview;
+            setInterview(interviewData);
+        };
+
+        fetchInterview();
+    }, [id, dispatch, navigate]);
+
+    // --- remove it ---
+    useEffect(() => {
+        if (interview) {
+            console.log("Interview:", interview);
+        }
+    }, [interview]);
+
+
+    if (!interview) return null;
+
     const startInterview = () => {
         setStarted(true);
         enterFullscreen();
-        startVapi(userData.name, API_RESPONSE.interview.jobRole, API_RESPONSE.interview.questions);
+        startVapi(userData?.name, interview.jobRole, interview.questions);
     };
 
     const stopInterview = () => {
         setEnded(true);
         stopVapi();
-    }
-
+    };
 
     const toggleSpeech = () => {
         if (!isSpeaking) {
@@ -85,29 +80,27 @@ export default function Interview() {
         }
     };
 
-    //--- RENDER: Start Screen ---
     if (!started)
-        return <StartScreen interview={API_RESPONSE.interview} startInterview={startInterview} />
+        return <StartScreen interview={interview} startInterview={startInterview} />;
 
-    // --- RENDER: End Screen ---
     if (ended)
-        return <EndScreen interview={API_RESPONSE.interview} tabSwitches={tabSwitches} />
+        return <EndScreen interview={interview} tabSwitches={tabSwitches} />;
 
-    // --- RENDER: Interview Dashboard ---
     return (
-        <div className="min-h-screen bg-gray-50 text-gray-900 font-sans relative">
-
+        <div className="min-h-screen bg-gray-50 text-gray-900 relative">
             <LogDialog
                 violation={violation}
                 onClose={() => setViolation(null)}
                 onReEnterFullscreen={enterFullscreen}
             />
-            {/* --- Header --- */}
-            <InterviewHeader jobRole={API_RESPONSE.interview.jobRole} stopInterview={stopInterview} />
 
-            {/* --- Main Content --- */}
+            <InterviewHeader
+                jobRole={interview.jobRole}
+                stopInterview={stopInterview}
+            />
+
             <InterviewContent
-                interview={API_RESPONSE.interview}
+                interview={interview}
                 videoRef={videoRef}
                 cameraError={error}
                 timeLeft={timeLeft}
