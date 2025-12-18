@@ -13,14 +13,19 @@ import { useProctoring } from "@/hooks/useProctoring";
 import { useVapi } from "@/hooks/useVapi";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
-import { _getInterview } from "@/redux/actions/interview-actions";
+import {
+    _getInterview,
+    _saveConversation,
+} from "@/redux/actions/interview-actions";
 import { interview as InterviewType } from "@/types/types";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Interview() {
-    const { id } = useParams<{ id: string }>();
+    const { id: jobId } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
     const userData = useAppSelector((state) => state.auth.userData);
+    const { loading } = useAppSelector((state) => state.interview);
     const dispatch = useAppDispatch();
 
     const [started, setStarted] = useState(false);
@@ -32,7 +37,8 @@ export default function Interview() {
     const [isSpeaking, setIsSpeaking] = useState(false);
 
     const { videoRef, error } = useCamera(started, ended, setIsVideoOn);
-    const { tabSwitches, violation, setViolation, enterFullscreen } = useProctoring(started, ended);
+    const { tabSwitches, violation, setViolation, enterFullscreen } =
+        useProctoring(started, ended);
     const { timeLeft } = useInterviewTimer(
         started,
         ended,
@@ -40,12 +46,12 @@ export default function Interview() {
         interview?.interviewDuration ?? 0
     );
 
-    const { startVapi, stopVapi } = useVapi(setIsSpeaking);
+    const { startVapi, stopVapi, conversation } = useVapi(setIsSpeaking);
 
     useEffect(() => {
         const fetchInterview = async () => {
             const { payload } = await dispatch(
-                _getInterview({ id: Number(id), navigate })
+                _getInterview({ id: Number(jobId), navigate })
             );
 
             const interviewData = payload?.data?.interview;
@@ -53,37 +59,45 @@ export default function Interview() {
         };
 
         fetchInterview();
-    }, [id, dispatch, navigate]);
+    }, [jobId, dispatch, navigate]);
 
     // --- remove it ---
-    useEffect(() => {
-        if (interview) {
-            console.log("Interview:", interview);
-        }
-    }, [interview]);
-
-    if (!interview) return null;
+    // useEffect(() => {
+    //     if (interview) {
+    //         console.log("Interview:", interview);
+    //         console.log("Conversation:", conversation);
+    //     }
+    // }, [interview, conversation]);
 
     const startInterview = () => {
         setStarted(true);
         enterFullscreen();
-        startVapi(userData?.name, interview.jobRole, interview.questions);
+        // startVapi(userData?.name, interview.jobRole, interview.questions);
     };
 
-    const stopInterview = () => {
+    const stopInterview = async () => {
         setEnded(true);
-        stopVapi();
+        // stopVapi();
+
+        const { payload } = await dispatch(
+            _saveConversation({
+                data: { jobId, conversation, tabSwitches },
+                navigate,
+            })
+        );
+
+        console.log("payload : ", payload);
     };
 
-    // --- remove it ---
-    const toggleSpeech = () => {
-        if (!isSpeaking) {
-            setIsSpeaking(true);
-            setTimeout(() => setIsSpeaking(false), 3000);
-        } else {
-            setIsSpeaking(false);
-        }
-    };
+    if (loading.fetch) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <Spinner className="size-8" />
+            </div>
+        );
+    }
+
+    if (!interview) return null;
 
     if (!started)
         return (

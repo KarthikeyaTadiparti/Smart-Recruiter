@@ -33,7 +33,7 @@ function EndScreen({interview, tabSwitches}: EndScreenProps) {
 
                 <button
                     onClick={() => window.location.reload()}
-                    className="w-full bg-[oklch(0.21_0.006_285.885)] hover:opacity-90 text-white py-2.5 rounded-lg transition-colors font-medium shadow-sm"
+                    className="w-full bg-primary hover:opacity-90 text-white py-2.5 rounded-lg transition-colors font-medium shadow-sm"
                 >
                     Return to Dashboard
                 </button>

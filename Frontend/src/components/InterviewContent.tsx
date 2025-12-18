@@ -53,14 +53,14 @@ function InterviewContent({
                     {/* Timeline / Progress Bar at Top */}
                     <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-100">
                         <div
-                            className="h-full bg-[oklch(0.21_0.006_285.885)] transition-all duration-500 ease-out"
+                            className="h-full bg-primary transition-all duration-500 ease-out"
                             style={{ width: `${((currentQuestionIndex + 1) / interview.noOfQuestions) * 100}%` }}
                         />
                     </div>
 
                     <div className="flex justify-between items-center mb-8 mt-2">
                         <div className="flex items-center gap-3">
-                            <span className="text-xs font-bold text-[oklch(0.21_0.006_285.885)] bg-gray-100 px-2 py-1 rounded uppercase tracking-wide">
+                            <span className="text-xs font-bold text-primary bg-gray-100 px-2 py-1 rounded uppercase tracking-wide">
                                 Question {currentQuestionIndex + 1} / {interview.noOfQuestions}
                             </span>
 
@@ -97,7 +97,7 @@ function InterviewContent({
                     </button>
                     <button
                         onClick={handleNext}
-                        className="flex items-center gap-2 px-6 py-2 bg-[oklch(0.21_0.006_285.885)] hover:opacity-90 text-white rounded-lg font-medium shadow-sm transition-all"
+                        className="flex items-center gap-2 px-6 py-2 bg-primary hover:opacity-90 text-white rounded-lg font-medium shadow-sm transition-all"
                     >
                         {currentQuestionIndex === interview.questions.length - 1 ? 'Finish Interview' : 'Next Question'}
                         <ChevronRight size={18} />
@@ -106,11 +106,11 @@ function InterviewContent({
 
                 {/* Proctoring Component */}
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 flex items-start gap-3">
-                    <div className="mt-0.5 text-[oklch(0.21_0.006_285.885)]">
+                    <div className="mt-0.5 text-primary">
                         <ShieldAlert size={16} />
                     </div>
                     <div>
-                        <h3 className="text-xs font-bold text-[oklch(0.21_0.006_285.885)] mb-0.5">Proctoring Active</h3>
+                        <h3 className="text-xs font-bold text-primary mb-0.5">Proctoring Active</h3>
                         <p className="text-[10px] text-gray-600 leading-relaxed">
                             Your browser activity and webcam are being monitored. Switching tabs or exiting fullscreen is recorded.
                         </p>
@@ -130,8 +130,8 @@ function InterviewContent({
                     {/* Simple Pulse Animation */}
                     <div className="relative flex items-center justify-center">
                         {isSpeaking && <div className="absolute w-24 h-24 bg-gray-200 rounded-full animate-ping opacity-75"></div>}
-                        <div className={`w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center border-4 ${isSpeaking ? 'border-[oklch(0.21_0.006_285.885)]' : 'border-white shadow-sm'} transition-colors duration-300 relative z-10`}>
-                            <div className="w-16 h-16 bg-[oklch(0.21_0.006_285.885)] rounded-full"></div>
+                        <div className={`w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center border-4 ${isSpeaking ? 'border-primary' : 'border-white shadow-sm'} transition-colors duration-300 relative z-10`}>
+                            <div className="w-16 h-16 bg-primary rounded-full"></div>
                         </div>
                     </div>
 

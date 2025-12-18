@@ -34,10 +34,12 @@ const interviewSlice = createSlice({
         builder 
             .addCase(_getInterview.pending,(state)=>{
                 state.loading.fetch = true
+                // console.log(true);
             })
             .addCase(_getInterview.fulfilled,(state,action)=>{
                 state.loading.fetch = false
                 state.interview = action.payload.data.interview
+                // console.log(false)
             })
             .addCase(_getInterview.rejected,(state,action)=>{
                 state.loading.fetch = false

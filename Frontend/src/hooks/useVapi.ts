@@ -1,15 +1,50 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import Vapi from "@vapi-ai/web";
-import { StructuredQuestion } from "@/types/types";
+import { Question } from "@/types/types";
 
 // --- helper functions ---
-function mapQuestionsToStrings(questions: StructuredQuestion[]): string[] {
+function mapQuestionsToStrings(questions: Question[]): string[] {
     return questions.map((q) => q.question);
 }
 
+const CONVERSATION = [
+    {
+        "role": "system",
+        "content": "You are an AI voice interviewer for the role of Full stack Developer.\nAsk the following questions one at a time in order:\n[\"In React, explain the difference between state and props. How do you manage component-specific data using the `useState` hook?\",\"Describe the role of `middleware` in an Express.js application. Can you give an example of a common use case for middleware, such as logging or authentication?\",\"When working with MongoDB, what are collections and documents? How do they conceptually relate to tables and rows in a relational database?\",\"How would you typically make an API call from your React frontend to your Express.js backend to fetch data? Briefly explain the steps involved, including what happens on both the client and server sides.\",\"You've deployed a MERN stack application, and users report that a specific feature is occasionally failing to save data to the database, though it works most of the time. What steps would you take to diagnose and debug this intermittent ..."
+    },
+    {
+        "role": "assistant",
+        "content": "Hi, Karthik. Yeah. How are you? Ready for your interview on full stack developer."
+    },
+    {
+        "role": "user",
+        "content": "Yeah. I'm ready."
+    },
+    {
+        "role": "assistant",
+        "content": "Great. Let's start with the first question. In React, explain the difference between state and props. How do you manage component specific data using the use of state hook?"
+    },
+    {
+        "role": "user",
+        "content": "Okay. So props are something the props are the data that are passed from parent component to children component, whereas states are"
+    },
+    {
+        "role": "assistant",
+        "content": "Okay. Not So props are for parent to child communication. And state is for managing data within a component. That's a good summary. Let's move on to the next question. Describe the role of middleware in an Express JS application. Can you give an example of a common use case for middleware such as logging or authentication?"
+    },
+    {
+        "role": "user",
+        "content": "Okay. So manually the function that sits in between the the, uh, request and the response object. And, um, for logging and authentication, middleware can be used to verify whether the user is whether the user's JWT token is verified. Correct 1 or not."
+    },
+    {
+        "role": "assistant",
+        "content": "Excellent explanation. Middleware truly is the backbone of Express."
+    }
+]
+
 export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
     const vapiRef = useRef<Vapi | null>(null);
-    const [conversation, setConversation] = useState<any[]>([]);
+    const [conversation, setConversation] = useState<any[]>(CONVERSATION);
 
     useEffect(() => {
         if (!import.meta.env.VITE_VAPI_PUBLIC_KEY) {
@@ -69,16 +104,11 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
         }
     }, [conversation]);
 
-  //   useEffect(() => {
-  //     if (callEnded && conversation.length > 0) {
-  //         dispatch(saveConversation(conversation));
-  //     }
-  // }, [callEnded, conversation, dispatch]);
 
     const startVapi = (
         name: string | null,
         jobRole: string,
-        questions: StructuredQuestion[]
+        questions: Question[]
     ) => {
         if (!vapiRef.current) return;
 
@@ -128,12 +158,11 @@ Rules:
         console.log("Vapi started");
     };
 
-    // ✅ Stop interview
     const stopVapi = () => {
         vapiRef.current?.stop();
         setIsSpeaking(false);
         console.log("Vapi stopped");
     };
 
-    return { startVapi, stopVapi };
+    return { startVapi, stopVapi, conversation };
 }

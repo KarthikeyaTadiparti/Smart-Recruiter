@@ -23,3 +23,21 @@ export const getInterview = wrapAsync(async (req: Request, res: Response) => {
         interview,
     });
 });
+
+export const createApplication = wrapAsync(
+    async (req: Request, res: Response) => {
+        const userId = Number(req.user!.id);
+        const { jobId, conversation, tabSwitches } = req.body;
+
+
+        console.log("User: ", userId);
+        console.log("Body: ",req.body);
+
+        // const application = await createApplication(jobId, userId);
+
+        return res.status(200).json({
+            status: true,
+            message: "Application created successfully",
+        });
+    }
+);
