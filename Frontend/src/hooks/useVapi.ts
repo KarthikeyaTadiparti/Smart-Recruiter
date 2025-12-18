@@ -1,60 +1,139 @@
-import { useRef } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import Vapi from "@vapi-ai/web";
+import { StructuredQuestion } from "@/types/types";
 
-export function useVapi() {
-  const vapiRef = useRef<Vapi | null>(null);
+// --- helper functions ---
+function mapQuestionsToStrings(questions: StructuredQuestion[]): string[] {
+    return questions.map((q) => q.question);
+}
 
-  const startVapi = (name: string | null, jobRole: string, questions: { type: string; question: string; }[]) => {
-    if (!import.meta.env.VITE_VAPI_PUBLIC_KEY) {
-      console.error("VAPI public key missing");
-      return;
-    }
+export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
+    const vapiRef = useRef<Vapi | null>(null);
+    const [conversation, setConversation] = useState<any[]>([]);
 
-    if (!vapiRef.current) {
-      vapiRef.current = new Vapi(import.meta.env.VITE_VAPI_PUBLIC_KEY);
-    }
+    useEffect(() => {
+        if (!import.meta.env.VITE_VAPI_PUBLIC_KEY) {
+            console.error("VAPI public key missing");
+            return;
+        }
 
-    const assistantOptions = {
-      name: "AI Recruiter",
+        const vapi = new Vapi(import.meta.env.VITE_VAPI_PUBLIC_KEY);
+        vapiRef.current = vapi;
 
-      firstMessage: `Hi ${name ?? "Candidate"}, how are you? Ready for your interview on ${jobRole}?`,
+        const onCallStart = () => {
+            console.log("Voice conversation started");
+        };
 
-      transcriber: {
-        provider: "deepgram" as const,
-        model: "nova-2",
-      },
+        const onCallEnd = () => {
+            console.log("Voice conversation ended");
+            setIsSpeaking(false);
+        };
 
-      language: "en-US",
+        const onSpeechStart = () => {
+            console.log("Assistant started speaking");
+            setIsSpeaking(true);
+        };
 
-      voice: {
-        provider: "playht" as const,
-        voiceId: "jennifer",
-      },
+        const onSpeechEnd = () => {
+            console.log("Assistant stopped speaking");
+            setIsSpeaking(false);
+        };
 
-      model: {
-        provider: "google" as const,
-        model: "gemini-2.5-flash",
-        messages: [
-          {
-            role: "system" as const,
-            content: `
-You are an AI voice assistant conducting interviews.
-Ask these questions in order:
-${JSON.stringify(questions)}
-            `,
-          },
-        ],
-      },
+        const onMessage = (message: any) => {
+            console.log(message);
+            if (message?.type === "conversation-update") {
+                setConversation(message.conversation);
+            }
+        };
+
+        vapi.on("call-start", onCallStart);
+        vapi.on("call-end", onCallEnd);
+        vapi.on("speech-start", onSpeechStart);
+        vapi.on("speech-end", onSpeechEnd);
+        vapi.on("message", onMessage);
+
+        return () => {
+            vapi.off("call-start", onCallStart);
+            vapi.off("call-end", onCallEnd);
+            vapi.off("speech-start", onSpeechStart);
+            vapi.off("speech-end", onSpeechEnd);
+            vapi.off("message", onMessage);
+            vapi.stop();
+        };
+    }, [setIsSpeaking]);
+
+    // --- remove it ---
+    useEffect(() => {
+        if (conversation.length > 0) {
+            console.log("Conversation updated:", conversation);
+        }
+    }, [conversation]);
+
+  //   useEffect(() => {
+  //     if (callEnded && conversation.length > 0) {
+  //         dispatch(saveConversation(conversation));
+  //     }
+  // }, [callEnded, conversation, dispatch]);
+
+    const startVapi = (
+        name: string | null,
+        jobRole: string,
+        questions: StructuredQuestion[]
+    ) => {
+        if (!vapiRef.current) return;
+
+        const questionStrings = mapQuestionsToStrings(questions);
+
+        const assistantOptions = {
+            name: "AI Recruiter",
+
+            firstMessage: `Hi ${
+                name ?? "Candidate"
+            }, how are you? Ready for your interview on ${jobRole}?`,
+
+            transcriber: {
+                provider: "deepgram" as const,
+                model: "nova-2",
+                language: "en-US",
+            },
+
+            voice: {
+                provider: "playht" as const,
+                voiceId: "jennifer",
+            },
+
+            model: {
+                provider: "google" as const,
+                model: "gemini-2.5-flash",
+                messages: [
+                    {
+                        role: "system" as const,
+                        content: `
+You are an AI voice interviewer for the role of ${jobRole}.
+Ask the following questions one at a time in order:
+${JSON.stringify(questionStrings)}
+
+Rules:
+- Wait for the candidate to finish before continuing
+- Give brief feedback after each answer
+- Encourage retries when needed
+- End with a short summary and encouragement
+`.trim(),
+                    },
+                ],
+            },
+        };
+
+        vapiRef.current.start(assistantOptions);
+        console.log("Vapi started");
     };
 
-    vapiRef.current.start(assistantOptions);
-    console.log("vapi started");
-  };
+    // ✅ Stop interview
+    const stopVapi = () => {
+        vapiRef.current?.stop();
+        setIsSpeaking(false);
+        console.log("Vapi stopped");
+    };
 
-  const stopVapi = () => {
-    vapiRef.current?.stop();
-    console.log("vapi stopped");
-  };
-
-  return { startVapi, stopVapi };
+    return { startVapi, stopVapi };
 }

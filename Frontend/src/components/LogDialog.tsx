@@ -1,6 +1,7 @@
 import {
     Dialog,
     DialogContent,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert } from "lucide-react";
@@ -36,9 +37,9 @@ function LogDialog({
                     </div>
 
                     <div className="flex-1">
-                        <h2 className="text-sm font-semibold text-red-600">
+                        <DialogTitle className="text-sm font-semibold text-red-600">
                             Proctoring Alert
-                        </h2>
+                        </DialogTitle>
                         <p className="mt-1 text-xs text-gray-600 leading-relaxed">
                             {violation === "TAB_SWITCH" &&
                                 "You switched tabs. Please stay focused on the interview."}

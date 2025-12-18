@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import LogDialog from '@/components/LogDialog';
-import StartScreen from '@/components/StartScreen';
-import EndScreen from '@/components/EndScreen';
-import InterviewHeader from '@/components/InterviewHeader';
-import InterviewContent from '@/components/InterviewContent';
+import LogDialog from "@/components/LogDialog";
+import StartScreen from "@/components/StartScreen";
+import EndScreen from "@/components/EndScreen";
+import InterviewHeader from "@/components/InterviewHeader";
+import InterviewContent from "@/components/InterviewContent";
 
-import { useCamera } from '@/hooks/useCamera';
-import { useInterviewTimer } from '@/hooks/useInterviewTimer';
-import { useProctoring } from '@/hooks/useProctoring';
-import { useVapi } from '@/hooks/useVapi';
+import { useCamera } from "@/hooks/useCamera";
+import { useInterviewTimer } from "@/hooks/useInterviewTimer";
+import { useProctoring } from "@/hooks/useProctoring";
+import { useVapi } from "@/hooks/useVapi";
 
-import { useAppDispatch, useAppSelector } from '@/hooks/use-redux';
-import { _getInterview } from '@/redux/actions/interview-actions';
-import { interview as InterviewType } from '@/types/types';
+import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
+import { _getInterview } from "@/redux/actions/interview-actions";
+import { interview as InterviewType } from "@/types/types";
 
 export default function Interview() {
     const { id } = useParams<{ id: string }>();
@@ -33,9 +33,14 @@ export default function Interview() {
 
     const { videoRef, error } = useCamera(started, ended, setIsVideoOn);
     const { tabSwitches, violation, setViolation, enterFullscreen } = useProctoring(started, ended);
-    const { timeLeft } = useInterviewTimer(started, ended, setEnded, interview?.interviewDuration ?? 0);
+    const { timeLeft } = useInterviewTimer(
+        started,
+        ended,
+        setEnded,
+        interview?.interviewDuration ?? 0
+    );
 
-    const { startVapi, stopVapi } = useVapi();
+    const { startVapi, stopVapi } = useVapi(setIsSpeaking);
 
     useEffect(() => {
         const fetchInterview = async () => {
@@ -57,7 +62,6 @@ export default function Interview() {
         }
     }, [interview]);
 
-
     if (!interview) return null;
 
     const startInterview = () => {
@@ -71,6 +75,7 @@ export default function Interview() {
         stopVapi();
     };
 
+    // --- remove it ---
     const toggleSpeech = () => {
         if (!isSpeaking) {
             setIsSpeaking(true);
@@ -81,7 +86,12 @@ export default function Interview() {
     };
 
     if (!started)
-        return <StartScreen interview={interview} startInterview={startInterview} />;
+        return (
+            <StartScreen
+                interview={interview}
+                startInterview={startInterview}
+            />
+        );
 
     if (ended)
         return <EndScreen interview={interview} tabSwitches={tabSwitches} />;

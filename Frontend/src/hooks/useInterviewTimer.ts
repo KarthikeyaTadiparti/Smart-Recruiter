@@ -1,21 +1,32 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-export function useInterviewTimer(started: boolean, ended: boolean, setEnded: Dispatch<SetStateAction<boolean>>, interviewDuration: number) {
-  const [timeLeft, setTimeLeft] = useState(interviewDuration * 60);
+export function useInterviewTimer(
+  started: boolean,
+  ended: boolean,
+  setEnded: Dispatch<SetStateAction<boolean>>,
+  interviewDuration: number
+) {
+  const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
-    console.log("Timer is running")
+    if (started && interviewDuration > 0) {
+      setTimeLeft(interviewDuration * 60);
+    }
+  }, [started, interviewDuration]);
 
-    if (!started || ended) return;
+  useEffect(() => {
+    if (!started || ended || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
           setEnded(true);
-          // Auto exit fullscreen on end
-          if (document.exitFullscreen)
-            document.exitFullscreen().catch(() => { });
+
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+          }
+
           return 0;
         }
         return prev - 1;
@@ -23,7 +34,7 @@ export function useInterviewTimer(started: boolean, ended: boolean, setEnded: Di
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [started, ended]);
+  }, [started, ended, timeLeft, setEnded]);
 
   return { timeLeft };
 }

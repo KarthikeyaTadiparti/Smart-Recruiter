@@ -11,3 +11,10 @@ export interface interview {
     }[];
     noOfQuestions: number;
 }
+
+
+export type StructuredQuestion = {
+    type: string;
+    question: string;
+  };
+  
