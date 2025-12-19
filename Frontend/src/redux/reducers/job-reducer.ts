@@ -4,7 +4,7 @@ import {
     _getAllJobs,
     _getJob,
 } from "@/redux/actions/job-actions";
-import { parseQuestions } from "@/lib/utils";
+
 
 export interface JobQuestion {
     type?: string;
@@ -37,6 +37,7 @@ const jobSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            //generate Questions
             .addCase(_generateQuestions.pending, (state) => {
                 state.loading.fetch = true;
                 state.error = null;
@@ -44,27 +45,7 @@ const jobSlice = createSlice({
             .addCase(_generateQuestions.fulfilled, (state, action) => {
                 state.loading.fetch = false;
                 state.error = null;
-
-                const payload = action.payload;
-
-                // Try to extract the raw questions from common shapes:
-                // - axios-like: payload.data.questions OR payload.data
-                // - direct: payload.questions
-                // - sometimes payload itself is string/object
-                let rawQuestions: any = undefined;
-                if (!payload) {
-                    rawQuestions = undefined;
-                } else if (Array.isArray(payload)) {
-                    rawQuestions = payload;
-                } else if (payload.data) {
-                    rawQuestions = payload.data.questions ?? payload.data;
-                } else if (payload.questions) {
-                    rawQuestions = payload.questions;
-                } else {
-                    rawQuestions = payload;
-                }
-
-                state.jobQuestions = parseQuestions(rawQuestions);
+                state.jobQuestions = action.payload.data.questions;
             })
             .addCase(_generateQuestions.rejected, (state, action) => {
                 state.loading.fetch = false;

@@ -5,112 +5,161 @@ import { GoogleGenAI } from "@google/genai";
 import ExpressError from "../middlewares/errorhandler.ts";
 import { addJob } from "../services/jobs-services.ts";
 import { addQuestions } from "../services/jobs-services.ts";
+import { generateQuestion } from "../utils/prompts.ts";
 
+export const generateInterviewQuestions = wrapAsync(
+    async (req: Request, res: Response) => {
+        const {
+            job_role,
+            description,
+            tech_stack,
+            experience,
+            location,
+            closed_at,
+            interview_duration,
+            interview_type,
+            no_of_questions,
+            companyId,
+        } = req.body;
 
-export const generateInterviewQuestions = wrapAsync(async (req: Request, res: Response) => {
-    const { job_role,
-        description,
-        tech_stack,
-        experience,
-        location,
-        closed_at,
-        interview_duration,
-        interview_type,
-        no_of_questions,
-        companyId
-    } = req.body;
-    const userId = Number(req.user!.id);
-    const companyIdNum = Number(companyId);
+        const userId = Number(req.user!.id);
+        const companyIdNum = Number(companyId);
 
-    if (!job_role || !description || !tech_stack || experience === undefined || !location || !closed_at || interview_duration === undefined || !interview_type || no_of_questions === undefined)
-        throw new ExpressError(400, "All fields are required");
-
-    // Questions Generation
-    const ai = new GoogleGenAI({
-        apiKey: process.env.GEMINI_API_KEY!,
-    });
-    const prompt = `
-        You are an expert interviewer. Generate interview questions based on the job information below.
-
-        Job Role: ${job_role}
-        Description: ${description}
-        Required Tech Stack: ${tech_stack}
-        Experience Required (Years): ${experience}
-        Interview Type: ${interview_type}
-        Number of Questions Needed: ${no_of_questions}
-
-        ### Interview Type Rules:
-        - If Interview Type = "technical":
-            * 80% technical based on tech_stack.
-            * 20% scenario-based.
-        - If Interview Type = "behavioral":
-            * 80% behavior, teamwork, past experience.
-            * 20% scenario-based.
-        - If Interview Type = "hr":
-            * Focus on culture fit, personality, strengths, weaknesses.
-            * No technical questions.
-        - If Interview Type = "mixed":
-            * 40% technical, 30% behavioral, 30% scenario-based.
-
-        ### Requirements:
-        1. Difficulty must match experience.
-        2. Every question must be highly relevant to the role.
-        3. Output exactly ${no_of_questions} questions.
-        4. Output strictly in JSON:
-
-        {
-        "questions": [
-            { "type": "", "question": "" }
-        ]
+        // Validation
+        if (
+            !job_role ||
+            !description ||
+            !tech_stack ||
+            experience === undefined ||
+            !location ||
+            !closed_at ||
+            interview_duration === undefined ||
+            !interview_type ||
+            no_of_questions === undefined
+        ) {
+            throw new ExpressError(400, "All fields are required");
         }
 
-        5. Do NOT include any non-JSON text.`
+        const ai = new GoogleGenAI({
+            apiKey: process.env.GEMINI_API_KEY!,
+        });
 
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-    });
+        const prompt = generateQuestion(
+            job_role,
+            description,
+            tech_stack,
+            experience,
+            interview_type,
+            no_of_questions
+        );
 
-    // Job Creation
-    const job = await addJob(
-        job_role,
-        description,
-        tech_stack,
-        experience,
-        location,
-        closed_at,
-        userId,
-        companyIdNum,
-        interview_duration,
-        interview_type,
-        no_of_questions
-    );
+        let response;
+        try {
+            response = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: prompt,
+            });
+        } catch (err: any) {
+            // Gemini overload handling
+            if (err?.error?.code === 503) {
+                return res.status(503).json({
+                    status: false,
+                    message:
+                        "AI service is currently busy. Please try again in a moment.",
+                });
+            }
 
-    res.status(200).json({
-        status: true,
-        message: "Questions generated successfully",
-        job,
-        questions: response.text,
-    });
-});
+            console.error("Gemini error:", err);
+            return res.status(500).json({
+                status: false,
+                message: "Failed to generate interview questions",
+            });
+        }
 
-export const addInterviewQuestions = wrapAsync(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const jobId = Number(id);
-    const questions = req.body;
+        const rawQuestion = response.text;
 
-    console.log("Questions : ", questions);
-    console.log("interview Id", id);
+        if (!rawQuestion) {
+            return res.status(500).json({
+                status: false,
+                message: "AI did not return any questions",
+            });
+        }
 
-    const updatedInterview = await addQuestions(jobId, questions);
-    return res.status(200).json({ status: true, message: "Job created successfully!", updatedInterview });
-});
+        // Clean markdown-wrapped JSON
+        const cleanedQuestion = rawQuestion
+            .replace(/```json/g, "")
+            .replace(/```/g, "")
+            .trim();
+
+        let questionsJSON;
+        try {
+            questionsJSON = JSON.parse(cleanedQuestion);
+        } catch (error) {
+            console.error("Failed to parse questions:", cleanedQuestion);
+            return res.status(500).json({
+                status: false,
+                message: "Invalid AI question format",
+            });
+        }
+
+        // Ensure expected structure
+        if (
+            !questionsJSON ||
+            !Array.isArray(questionsJSON.questions)
+        ) {
+            return res.status(500).json({
+                status: false,
+                message: "AI returned an unexpected questions format",
+            });
+        }
+
+        // Job Creation
+        const job = await addJob(
+            job_role,
+            description,
+            tech_stack,
+            experience,
+            location,
+            closed_at,
+            userId,
+            companyIdNum,
+            interview_duration,
+            interview_type,
+            no_of_questions
+        );
+
+        return res.status(200).json({
+            status: true,
+            message: "Questions generated successfully",
+            job,
+            questions: questionsJSON.questions, 
+        });
+    }
+);
+
+export const addInterviewQuestions = wrapAsync(
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const jobId = Number(id);
+        const questions = req.body;
+
+        console.log("Questions : ", questions);
+        console.log("interview Id", id);
+
+        const updatedInterview = await addQuestions(jobId, questions);
+        return res.status(200).json({
+            status: true,
+            message: "Job created successfully!",
+            updatedInterview,
+        });
+    }
+);
 
 export const getAllJobs = wrapAsync(async (req: Request, res: Response) => {
     const jobs = await fetchAllJobs();
 
     return res.status(200).json({ status: true, jobs });
-})
+});
 
 export const getJob = wrapAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
