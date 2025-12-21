@@ -50,3 +50,29 @@ export type Question = {
     type: string;
     question: string;
 };
+
+export interface Application {
+    applicationId: number;
+    candidateId: number;
+    jobId: number;
+    technicalScore: string;
+    communicationScore: string;
+    confidenceScore: string;
+    overallScore: string;
+    tabSwitches: number;
+    questionAnswers: {
+        question: string;
+        answer: string;
+    }[];
+    feedback: string;
+    createdAt: string;
+    updatedAt: string;
+}
+export interface Candidate {
+    name: string;
+    email: string;
+}
+export interface FeedbackData {
+    application: Application;
+    candidate: Candidate;
+}

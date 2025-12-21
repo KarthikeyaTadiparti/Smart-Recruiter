@@ -22,7 +22,6 @@ function InterviewContent({
     const handleNext = () => {
         if (currentQuestionIndex < interview.questions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
-            // setIsSpeaking(false);
         } else {
             setInterviewEnded(true);
             if (document.exitFullscreen) document.exitFullscreen().catch(() => { });
@@ -32,7 +31,6 @@ function InterviewContent({
     const handlePrev = () => {
         if (currentQuestionIndex > 0) {
             setCurrentQuestionIndex(prev => prev - 1);
-            // setIsSpeaking(false);
         }
     };
 

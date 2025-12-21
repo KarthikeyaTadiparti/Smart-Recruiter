@@ -2,16 +2,19 @@ import { combineReducers, Reducer, UnknownAction } from "@reduxjs/toolkit";
 import authSlice from './auth-reducer'
 import jobSlice from './job-reducer'
 import interviewSlice from './interview-reducer'
+import feedbackSlice from './feedback-reducer'
 export interface RootState {
     auth: ReturnType<typeof authSlice>
     job: ReturnType<typeof jobSlice>
     interview: ReturnType<typeof interviewSlice>
+    feedback : ReturnType<typeof feedbackSlice> 
 }
 
 const reducers = combineReducers({
     auth: authSlice,
     job: jobSlice,
-    interview : interviewSlice
+    interview : interviewSlice,
+    feedback : feedbackSlice
 })
 
 const rootReducer: Reducer<RootState, UnknownAction> = (state, action) => {

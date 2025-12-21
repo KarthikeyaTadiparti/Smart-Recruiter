@@ -19,6 +19,7 @@ import Cam from "./pages/Cam";
 import InterviewQuestions from "./pages/recruiter/InterviewQuestions";
 import Job from "./pages/candidate/Job";
 import Interview from "./pages/candidate/Interview";
+import Feedback from "./pages/candidate/Feedback";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
@@ -81,10 +82,6 @@ function App() {
         {/* public route */}
         <Route path="/login" element={<ProtectedAuthRoute element={<Login />} />} />
         <Route path="/signup" element={<ProtectedAuthRoute element={<Signup />} />} />
-        <Route path="/test" element={<Test />} />
-        <Route path="/cam" element={<Cam />} />
-        {/* <Route path="/vapi" element={<VapiWidget />} /> */}
-
         <Route path="/interviews/:id" element={<Interview />} />
 
         {/* protected routes */}
@@ -100,6 +97,7 @@ function App() {
           <Route path="explore" element={<Explore />} />
           <Route path="explore/:id" element={<Job />} />
           <Route path="my-interviews" element={<MyInterviews />} />
+          <Route path="feedback/:id" element={<Feedback  />} />
         </Route>
 
 

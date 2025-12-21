@@ -1,6 +1,7 @@
 import db from "../config/db.ts";
 import { eq } from "drizzle-orm";
 import { applications } from "../schema/applications-schema.ts";
+import { users } from "../schema/users-schema.ts";
 import { Application } from "../types/interview.ts";
 import ExpressError from "../middlewares/errorhandler.ts";
 
@@ -18,13 +19,23 @@ export async function getApplicationById(applicationId: number) {
         throw new ExpressError(400, "Invalid application id");
     }
 
-    const [application] = await db
-        .select()
+    const [result] = await db
+        .select({
+            application: applications,
+            candidate: {
+                name: users.name,
+                email: users.email
+            }
+        })
         .from(applications)
+        .innerJoin(users, eq(applications.candidateId, users.id))
         .where(eq(applications.applicationId, applicationId));
 
-    return application;
+    if (!result) return null;
+
+    return result;
 }
+
 // --- remove it ---
 export async function getAllApplications() {
     const allApplications = await db.select().from(applications);

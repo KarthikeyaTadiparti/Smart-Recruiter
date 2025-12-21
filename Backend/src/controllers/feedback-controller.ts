@@ -120,6 +120,31 @@ export const createApplication = wrapAsync(
     }
 );
 
+export const getApplication = wrapAsync(
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const applicationId = Number(id);
+
+        if (!Number.isInteger(applicationId) || applicationId <= 0) {
+            throw new ExpressError(400, "Invalid application id");
+        }
+
+        const response = await getApplicationById(applicationId);
+
+        if (!response) {
+            throw new ExpressError(404, "Application not found");
+        }
+
+        return res.status(200).json({
+            status: true,
+            message: "Application retrieved successfully",
+            application: response?.application,
+            candidate: response?.candidate,
+        });
+    }
+);
+
+
 export const getApplicationsByCandidate = wrapAsync(
     async (req: Request, res: Response) => {
         const { candidateId } = req.params;
@@ -139,28 +164,6 @@ export const getApplicationsByCandidate = wrapAsync(
     }
 );
 
-export const getApplication = wrapAsync(
-    async (req: Request, res: Response) => {
-        const { id } = req.params;
-        const applicationId = Number(id);
-
-        if (!Number.isInteger(applicationId) || applicationId <= 0) {
-            throw new ExpressError(400, "Invalid application id");
-        }
-
-        const application = await getApplicationById(applicationId);
-
-        if (!application) {
-            throw new ExpressError(404, "Application not found");
-        }
-
-        return res.status(200).json({
-            status: true,
-            message: "Application retrieved successfully",
-            application,
-        });
-    }
-);
 
 export const getAllApplicationsController = wrapAsync(
     async (req: Request, res: Response) => {

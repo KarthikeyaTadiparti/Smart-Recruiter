@@ -19,6 +19,7 @@ import {
 } from "@/redux/actions/interview-actions";
 import { interview as InterviewType } from "@/types/types";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 export default function Interview() {
     const { id: jobId } = useParams<{ id: string }>();
@@ -60,24 +61,34 @@ export default function Interview() {
 
         fetchInterview();
     }, [jobId, dispatch, navigate]);
+    
+
+    useEffect(() => {
+        if (started && timeLeft === 0 && !ended) {
+            stopInterview();
+        }
+    }, [timeLeft, started, ended]);
 
     // --- remove it ---
-    // useEffect(() => {
-    //     if (interview) {
-    //         console.log("Interview:", interview);
-    //         console.log("Conversation:", conversation);
-    //     }
-    // }, [interview, conversation]);
+    useEffect(() => {
+        if (interview) {
+            console.log("Interview:", interview);
+            console.log("Conversation:", conversation);
+        }
+    }, [interview, conversation]);
 
     const startInterview = () => {
+        if (!userData?.name || !interview) return;
+        
         setStarted(true);
         enterFullscreen();
-        // startVapi(userData?.name, interview.jobRole, interview.questions);
+
+        startVapi(userData?.name, interview?.jobRole, interview?.questions);
     };
 
     const stopInterview = async () => {
-        setEnded(true);
-        // stopVapi();
+        // setEnded(true);
+        stopVapi();
 
         const { payload } = await dispatch(
             _saveConversation({
@@ -87,6 +98,11 @@ export default function Interview() {
         );
 
         console.log("payload : ", payload);
+        if(payload.data.status){
+            navigate(`/candidate/feedback/${payload.data.applicantId}`);
+        }else{
+            toast.error(payload.data.message);
+        }
     };
 
     if (loading.fetch) {

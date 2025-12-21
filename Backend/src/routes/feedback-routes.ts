@@ -10,28 +10,26 @@ import { ensureAuthentication } from "../middlewares/auth.ts";
 
 const feedbackRouter = express.Router();
 
-// Create application (with AI feedback generation)
 feedbackRouter.post("/", ensureAuthentication, createApplication);
+feedbackRouter.get("/:id", ensureAuthentication, getApplication);
 
-// Get all applications
-feedbackRouter.get("/", ensureAuthentication, getAllApplicationsController);
-
-// Get applications by candidate id (must come before /:id)
+// candidate can view their applications for various jobs
 feedbackRouter.get(
     "/candidate/:candidateId",
     ensureAuthentication,
     getApplicationsByCandidate
 );
 
-// Get applications by job id (must come before /:id)
+// recruiter can view applications for a specific job
 feedbackRouter.get(
     "/job/:jobId",
     ensureAuthentication,
     getApplicationsByJob
 );
 
-// Get application by id
-feedbackRouter.get("/:id", ensureAuthentication, getApplication);
+
+// Get all applications
+feedbackRouter.get("/", ensureAuthentication, getAllApplicationsController);
 
 
 
