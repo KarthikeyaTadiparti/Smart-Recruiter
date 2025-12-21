@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import LogDialog from "@/components/LogDialog";
 import StartScreen from "@/components/StartScreen";
-import EndScreen from "@/components/EndScreen";
 import InterviewHeader from "@/components/InterviewHeader";
 import InterviewContent from "@/components/InterviewContent";
 
@@ -13,10 +12,8 @@ import { useProctoring } from "@/hooks/useProctoring";
 import { useVapi } from "@/hooks/useVapi";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
-import {
-    _getInterview,
-    _saveConversation,
-} from "@/redux/actions/interview-actions";
+import { _getInterview } from "@/redux/actions/interview-actions";
+import { _saveConversation } from "@/redux/actions/feedback-actions";
 import { interview as InterviewType } from "@/types/types";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
@@ -26,7 +23,8 @@ export default function Interview() {
     const navigate = useNavigate();
 
     const userData = useAppSelector((state) => state.auth.userData);
-    const { loading } = useAppSelector((state) => state.interview);
+    const { fetch } = useAppSelector((state) => state.interview.loading);
+    const { post } = useAppSelector((state) => state.feedback.loading);
     const dispatch = useAppDispatch();
 
     const [started, setStarted] = useState(false);
@@ -40,10 +38,9 @@ export default function Interview() {
     const { videoRef, error } = useCamera(started, ended, setIsVideoOn);
     const { tabSwitches, violation, setViolation, enterFullscreen } =
         useProctoring(started, ended);
-    const { timeLeft } = useInterviewTimer(
+    const { timeLeft, isTimeUp } = useInterviewTimer(
         started,
         ended,
-        setEnded,
         interview?.interviewDuration ?? 0
     );
 
@@ -61,13 +58,13 @@ export default function Interview() {
 
         fetchInterview();
     }, [jobId, dispatch, navigate]);
-    
+
 
     useEffect(() => {
-        if (started && timeLeft === 0 && !ended) {
+        if (isTimeUp && !ended) {
             stopInterview();
         }
-    }, [timeLeft, started, ended]);
+    }, [isTimeUp, ended]);
 
     // --- remove it ---
     useEffect(() => {
@@ -79,7 +76,7 @@ export default function Interview() {
 
     const startInterview = () => {
         if (!userData?.name || !interview) return;
-        
+
         setStarted(true);
         enterFullscreen();
 
@@ -87,25 +84,30 @@ export default function Interview() {
     };
 
     const stopInterview = async () => {
-        // setEnded(true);
+        if (ended) return;
+        setEnded(true);
         stopVapi();
 
-        const { payload } = await dispatch(
-            _saveConversation({
-                data: { jobId, conversation, tabSwitches },
-                navigate,
-            })
-        );
+        try {
+            const { payload } = await dispatch(
+                _saveConversation({
+                    data: { jobId, conversation, tabSwitches },
+                    navigate,
+                })
+            );
 
-        console.log("payload : ", payload);
-        if(payload.data.status){
-            navigate(`/candidate/feedback/${payload.data.applicantId}`);
-        }else{
-            toast.error(payload.data.message);
+            if (payload?.data?.status) {
+                navigate(`/candidate/feedback/${payload.data.application.applicationId}`);
+            } else {
+                toast.error(payload?.data?.message || "Failed to save interview session");
+            }
+        } catch (error) {
+            console.error("Error saving interview:", error);
+            toast.error("An unexpected error occurred while saving the interview");
         }
     };
 
-    if (loading.fetch) {
+    if (fetch || post) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white">
                 <Spinner className="size-8" />
@@ -123,8 +125,6 @@ export default function Interview() {
             />
         );
 
-    if (ended)
-        return <EndScreen interview={interview} tabSwitches={tabSwitches} />;
 
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900 relative">
@@ -145,7 +145,7 @@ export default function Interview() {
                 cameraError={error}
                 timeLeft={timeLeft}
                 tabSwitches={tabSwitches}
-                setEnded={setEnded}
+                stopInterview={stopInterview}
                 setIsMicOn={setIsMicOn}
                 isMicOn={isMicOn}
                 setIsVideoOn={setIsVideoOn}

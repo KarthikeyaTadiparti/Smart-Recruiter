@@ -6,7 +6,7 @@ function InterviewContent({
     interview,
     timeLeft,
     tabSwitches,
-    setInterviewEnded,
+    stopInterview,
     videoRef,
     cameraError,
     setIsMicOn,
@@ -23,7 +23,7 @@ function InterviewContent({
         if (currentQuestionIndex < interview.questions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
         } else {
-            setInterviewEnded(true);
+            stopInterview();
             if (document.exitFullscreen) document.exitFullscreen().catch(() => { });
         }
     };

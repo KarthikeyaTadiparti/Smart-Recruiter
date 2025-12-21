@@ -30,7 +30,7 @@ app.use('/auth',authRoutes);
 app.use('/companies',companyRoutes);
 app.use('/jobs',jobRoutes);
 app.use('/interviews',interviewRoutes);
-app.use('/feedback',feedbackRoutes);
+app.use('/feedbacks',feedbackRoutes);
 
 app.get("/test", async (req, res) => {
   try {

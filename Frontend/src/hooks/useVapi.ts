@@ -117,24 +117,23 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
         const assistantOptions = {
             name: "AI Recruiter",
 
-            firstMessage: `Hi ${
-                name ?? "Candidate"
-            }, how are you? Ready for your interview on ${jobRole}?`,
+            firstMessage: `Hi ${name ?? "Candidate"
+                }, how are you? Ready for your interview on ${jobRole}?`,
 
             transcriber: {
                 provider: "deepgram" as const,
-                model: "nova-2",
-                language: "en-US",
+                model: "nova-2" as const,
+                language: "en-US" as const,
             },
 
             voice: {
                 provider: "playht" as const,
-                voiceId: "jennifer",
+                voiceId: "jennifer" as const,
             },
 
             model: {
                 provider: "google" as const,
-                model: "gemini-2.5-flash",
+                model: "gemini-2.5-flash" as const,
                 messages: [
                     {
                         role: "system" as const,
