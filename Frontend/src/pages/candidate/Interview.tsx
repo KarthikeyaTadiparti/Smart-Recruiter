@@ -109,7 +109,7 @@ export default function Interview() {
 
     if (fetch || post) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
+            <div className="min-h-screen flex items-center justify-center bg-white z-60">
                 <Spinner className="size-8" />
             </div>
         );

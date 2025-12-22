@@ -21,6 +21,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
 
@@ -120,7 +121,8 @@ export default function RecruiterDashboard() {
     <div className="flex flex-1 flex-col gap-4 relative">
       {showCompanyDialog && (
         <Dialog open={showCompanyDialog} onOpenChange={setShowCompanyDialog}>
-          <DialogContent>
+          <DialogContent className="[&>button]:hidden" onEscapeKeyDown={(e) => e.preventDefault()}
+            onPointerDownOutside={(e) => e.preventDefault()}>
             <DialogHeader>
               <DialogTitle>Company Details</DialogTitle>
               <DialogDescription>

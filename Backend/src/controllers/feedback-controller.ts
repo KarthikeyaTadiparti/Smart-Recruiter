@@ -164,21 +164,6 @@ export const getApplicationsByCandidate = wrapAsync(
     }
 );
 
-
-export const getAllApplicationsController = wrapAsync(
-    async (req: Request, res: Response) => {
-        const applications = await getAllApplications();
-
-        return res.status(200).json({
-            status: true,
-            message: "Applications retrieved successfully",
-            applications,
-            count: applications.length,
-        });
-    }
-);
-
-
 export const getApplicationsByJob = wrapAsync(
     async (req: Request, res: Response) => {
         const { jobId } = req.params;
@@ -198,4 +183,20 @@ export const getApplicationsByJob = wrapAsync(
         });
     }
 );
+
+
+export const getAllApplicationsController = wrapAsync(
+    async (req: Request, res: Response) => {
+        const applications = await getAllApplications();
+
+        return res.status(200).json({
+            status: true,
+            message: "Applications retrieved successfully",
+            applications,
+            count: applications.length,
+        });
+    }
+);
+
+
 

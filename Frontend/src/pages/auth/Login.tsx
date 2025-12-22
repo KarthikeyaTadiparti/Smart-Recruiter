@@ -14,6 +14,8 @@ import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/hooks/use-redux"
 import { toast } from "sonner"
 import { _userLogin } from "@/redux/actions/auth-actions"
+import { useAppSelector } from "@/hooks/use-redux"
+import { Spinner } from "@/components/ui/spinner"
 
 type Role = "candidate" | "recruiter"
 
@@ -26,6 +28,7 @@ interface Login {
 function Login() {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
+    const { loading } = useAppSelector((state) => state.auth)
     const [login, setLogin] = useState<Login>({
         email: "",
         password: "",
@@ -45,6 +48,10 @@ function Login() {
 
     return (
         <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+            {loading.login && (<div className="absolute inset-0 z-60 grid place-items-center bg-white/70">
+                <Spinner className="size-8" />
+            </div>)}
+
             <div className="w-full max-w-sm">
                 <Tabs
                     defaultValue="candidate"

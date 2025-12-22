@@ -11,9 +11,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router-dom"
-import { useAppDispatch } from "@/hooks/use-redux"
+import { useAppDispatch, useAppSelector } from "@/hooks/use-redux"
 import { toast } from "sonner"
 import { _userSignup } from "@/redux/actions/auth-actions"
+import { Spinner } from "@/components/ui/spinner"
+import { RootState } from "@/redux/reducers"
 
 type Role = "candidate" | "recruiter";
 
@@ -27,6 +29,7 @@ interface Signup {
 function Signup() {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
+    const { loading } = useAppSelector((state: RootState) => state.auth)
     const [signup, setSignup] = useState<Signup>({
         name: '',
         email: '',
@@ -50,6 +53,10 @@ function Signup() {
 
     return (
         <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+            {loading.signup && (<div className="absolute inset-0 z-60 grid place-items-center bg-white/70">
+                <Spinner className="size-8" />
+            </div>)}
+
             <div className="w-full max-w-sm">
                 <Tabs
                     defaultValue="candidate"

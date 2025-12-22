@@ -97,7 +97,7 @@ function App() {
           <Route path="explore" element={<Explore />} />
           <Route path="explore/:id" element={<Job />} />
           <Route path="my-interviews" element={<MyInterviews />} />
-          <Route path="feedback/:id" element={<Feedback  />} />
+          <Route path="feedback/:id" element={<Feedback />} />
         </Route>
 
 

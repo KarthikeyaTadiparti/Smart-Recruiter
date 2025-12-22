@@ -75,7 +75,7 @@ function Explore() {
         <>
             {/* Spinner */}
             {loading.fetchAll && (
-                <div className="absolute inset-0 z-50 grid place-items-center bg-white/70">
+                <div className="absolute inset-0 z-60 grid place-items-center bg-white/70">
                     <Spinner className="size-8" />
                 </div>
             )}
