@@ -6,6 +6,7 @@ import { JobQuestion } from "@/redux/reducers/job-reducer";
 import type { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import { _createJob } from "@/redux/actions/job-actions";
+import { Spinner } from "@/components/ui/spinner";
 
 const getQuestionStyles = (typeString?: string) => {
     const type = (typeString || "").toLowerCase();
@@ -26,6 +27,7 @@ const InterviewQuestions: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
 
     const jobQuestions = useAppSelector((state: RootState) => state.job.jobQuestions);
+    const { loading } = useAppSelector((state: RootState) => state.job);
     const questions = Array.isArray(jobQuestions) ? jobQuestions : [];
 
 
@@ -33,7 +35,7 @@ const InterviewQuestions: React.FC = () => {
         try {
             const { payload } = await dispatch(_createJob({ questions, id, navigate }));
 
-            console.log("payload : ",payload);
+            console.log("payload : ", payload);
 
             if (payload?.data?.status) {
                 toast.success(payload?.data?.message || "Interview created");
@@ -49,6 +51,14 @@ const InterviewQuestions: React.FC = () => {
 
     return (
         <main className="max-w-5xl mx-auto flex flex-1 flex-col p-4">
+
+            {/* Spinner */}
+            {loading.storeQuestions && (
+                <div className="absolute inset-0 z-60 grid place-items-center bg-white/70">
+                    <Spinner className="size-8" />
+                </div>
+            )}
+            
             <div className="mb-6">
                 <h1 className="text-2xl font-semibold text-gray-900">Interview Questions</h1>
                 <p className="text-gray-500 text-sm mt-1">Review the generated questions for the candidate.</p>

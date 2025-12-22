@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import DatePickerButtonRHF from "@/components/DatePickerButtonRHF";
+import { Spinner } from "@/components/ui/spinner";
 
 
 export interface Job {
@@ -55,13 +56,14 @@ function CreateInterview() {
   const company = userData.company;
 
   const dispatch = useAppDispatch();
+  const { loading } = useAppSelector((state) => state.job);
   const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<Job> = async (data) => {
     console.log("form submit:", data);
 
     try {
-      const { payload } = await dispatch(_generateQuestions({data: {...data,companyId: company.id}, navigate}));
+      const { payload } = await dispatch(_generateQuestions({ data: { ...data, companyId: company.id }, navigate }));
 
       console.log("payload : ", payload?.data);
 
@@ -82,6 +84,13 @@ function CreateInterview() {
 
   return (
     <main className="flex flex-1 flex-col gap-4 relative p-4">
+
+      {/* Spinner */}
+      {loading.generateQuestions && (
+        <div className="absolute inset-0 z-60 grid place-items-center bg-white/70">
+          <Spinner className="size-8" />
+        </div>
+      )}
 
       <Card className="w-3/5 mx-auto px-6 py-8">
         <CardHeader className="px-0">

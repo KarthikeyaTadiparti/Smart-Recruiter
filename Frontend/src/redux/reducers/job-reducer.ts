@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+    _createJob,
     _generateQuestions,
     _getAllJobs,
     _getJob,
@@ -15,6 +16,8 @@ interface JobInitialStateType {
     loading: {
         fetchAll: boolean;
         fetch: boolean;
+        generateQuestions: boolean;
+        storeQuestions: boolean;
     };
     error: string | null;
     jobQuestions: JobQuestion[];
@@ -25,6 +28,8 @@ const initialState: JobInitialStateType = {
     loading: {
         fetchAll: false,
         fetch: false,
+        generateQuestions: false,
+        storeQuestions: false,
     },
     error: null,
     jobQuestions: [],
@@ -39,18 +44,33 @@ const jobSlice = createSlice({
         builder
             //generate Questions
             .addCase(_generateQuestions.pending, (state) => {
-                state.loading.fetch = true;
+                state.loading.generateQuestions = true;
                 state.error = null;
             })
             .addCase(_generateQuestions.fulfilled, (state, action) => {
-                state.loading.fetch = false;
+                state.loading.generateQuestions = false;
                 state.error = null;
                 state.jobQuestions = action.payload.data.questions;
             })
             .addCase(_generateQuestions.rejected, (state, action) => {
-                state.loading.fetch = false;
+                state.loading.generateQuestions = false;
                 state.error =
                     action.error?.message ?? "Failed to generate questions";
+            })
+
+            .addCase(_createJob.pending, (state) => {
+                state.loading.storeQuestions = true;
+                state.error = null;
+            })
+            .addCase(_createJob.fulfilled, (state, action) => {
+                state.loading.storeQuestions = false;
+                state.error = null;
+                state.jobQuestions = action.payload.data.questions;
+            })
+            .addCase(_createJob.rejected, (state, action) => {
+                state.loading.storeQuestions = false;
+                state.error =
+                    action.error?.message ?? "Failed to store questions";
             })
 
             //fetchAll
