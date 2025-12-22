@@ -88,22 +88,23 @@ export const createApplication = wrapAsync(
         }
 
         const scores = feedbackJson.scores;
-        const overallScore = (
-            (Number(scores?.technicalScore) +
-                Number(scores?.communicationScore) +
-                Number(scores?.confidenceScore)) /
-            3
-        ).toFixed(1);
+        const overallScore = Number(
+            (
+                (Number(scores?.technicalScore) +
+                    Number(scores?.communicationScore) +
+                    Number(scores?.confidenceScore)) / 3
+            ).toFixed(1)
+        );
         const application: Application = {
             candidateId: userId,
             jobId: jobId,
 
-            technicalScore: scores?.technicalScore,
-            communicationScore: scores?.communicationScore,
-            confidenceScore: scores?.confidenceScore,
-            overallScore: overallScore,
+            technicalScore: Number(scores?.technicalScore),
+            communicationScore: Number(scores?.communicationScore),
+            confidenceScore: Number(scores?.confidenceScore),
+            overallScore: Number(overallScore),
 
-            tabSwitches: tabSwitches,
+            tabSwitches: Number(tabSwitches),
             conversation: conversation,
             questionAnswers: feedbackJson?.questionAnswers,
             feedback: feedbackJson?.summary,
@@ -113,7 +114,6 @@ export const createApplication = wrapAsync(
 
         return res.status(201).json({
             status: true,
-            // feedback: feedbackJson,
             application: dbresponse,
             message: "Application created successfully",
         });

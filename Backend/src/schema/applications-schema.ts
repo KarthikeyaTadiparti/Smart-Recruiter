@@ -21,10 +21,30 @@ export const applications = pgTable("applications", {
         .notNull()
         .references(() => jobs.jobId),
 
-    technicalScore: decimal("technical_score").notNull(),
-    communicationScore: decimal("communication_score").notNull(),
-    confidenceScore: decimal("confidence_score").notNull(),
-    overallScore: decimal("overall_score").notNull(),
+    technicalScore: decimal("technical_score", {
+        precision: 4,
+        scale: 2,
+        mode: "number",
+    }).notNull(),
+
+    communicationScore: decimal("communication_score", {
+        precision: 4,
+        scale: 2,
+        mode: "number",
+    }).notNull(),
+
+    confidenceScore: decimal("confidence_score", {
+        precision: 4,
+        scale: 2,
+        mode: "number",
+    }).notNull(),
+
+    overallScore: decimal("overall_score", {
+        precision: 4,
+        scale: 2,
+        mode: "number",
+    }).notNull(),
+
 
     tabSwitches: integer("tabswitches").notNull(),
 

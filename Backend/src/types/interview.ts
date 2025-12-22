@@ -7,10 +7,10 @@ export interface Application {
     candidateId: number;
     jobId: number;
 
-    technicalScore: string;
-    communicationScore: string;
-    confidenceScore: string;
-    overallScore: string;
+    technicalScore: number;
+    communicationScore: number;
+    confidenceScore: number;
+    overallScore: number;
 
     tabSwitches: number;
 
