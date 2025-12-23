@@ -62,8 +62,19 @@ export async function getApplicationsByJobId(jobId: number) {
     }
 
     const jobApplications = await db
-        .select()
+        .select({
+            application: {
+                applicationId: applications.applicationId,
+                overallScore: applications.overallScore,
+                tabSwitches: applications.tabSwitches,
+            },
+            candidate: {
+                name: users.name,
+                email: users.email
+            }
+        })
         .from(applications)
+        .innerJoin(users, eq(applications.candidateId, users.id))
         .where(eq(applications.jobId, jobId));
 
     return jobApplications;

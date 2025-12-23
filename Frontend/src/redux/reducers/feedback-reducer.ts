@@ -1,8 +1,6 @@
 import { Application, Candidate } from "@/types/types";
 import { createSlice } from "@reduxjs/toolkit";
-import { _getFeedback, _saveConversation } from "../actions/feedback-actions";
-
-
+import { _getFeedback, _getFeedbacksByJobId, _saveConversation } from "../actions/feedback-actions";
 
 interface FeedbackState {
     application: Application | null;
@@ -27,18 +25,7 @@ const initialState: FeedbackState = {
 const feedbackSlice = createSlice({
     name: "feedback",
     initialState,
-    reducers: {
-        // setFeedback: (state, action) => {
-        //     state.application = action.payload.application;
-        //     state.candidate = action.payload.candidate;
-        // },
-        // setLoading: (state, action) => {
-        //     state.loading.fetch = action.payload;
-        // },
-        // setError: (state, action) => {
-        //     state.error = action.payload;
-        // },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(_getFeedback.pending, (state) => {
@@ -50,6 +37,17 @@ const feedbackSlice = createSlice({
                 state.candidate = action.payload.data.candidate;
             })
             .addCase(_getFeedback.rejected, (state, action) => {
+                state.loading.fetch = false;
+                state.error = action.error.message;
+            })
+
+            .addCase(_getFeedbacksByJobId.pending, (state) => {
+                state.loading.fetch = true;
+            })
+            .addCase(_getFeedbacksByJobId.fulfilled, (state) => {
+                state.loading.fetch = false;
+            })
+            .addCase(_getFeedbacksByJobId.rejected, (state, action) => {
                 state.loading.fetch = false;
                 state.error = action.error.message;
             })
@@ -69,5 +67,4 @@ const feedbackSlice = createSlice({
     }
 });
 
-// export const { setFeedback, setLoading, setError } = feedbackSlice.actions;
 export default feedbackSlice.reducer;
