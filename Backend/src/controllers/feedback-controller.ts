@@ -18,12 +18,15 @@ export const createApplication = wrapAsync(
         const jobId = Number(req.body.jobId);
         const tabSwitches = Number(req.body.tabSwitches);
         const conversation = req.body.conversation;
+        const questions = req.body.questions;
+
+        console.log(questions);
 
         const ai = new GoogleGenAI({
             apiKey: process.env.GEMINI_API_KEY!,
         });
 
-        const prompt = generateFeedback(conversation);
+        const prompt = generateFeedback(conversation, questions);
 
         let response;
         try {

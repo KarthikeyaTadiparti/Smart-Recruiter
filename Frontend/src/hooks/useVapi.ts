@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import Vapi from "@vapi-ai/web";
 import { Question } from "@/types/types";
+import { vapiPrompt } from "@/lib/prompts";
 
 // --- helper functions ---
 function mapQuestionsToStrings(questions: Question[]): string[] {
@@ -137,17 +138,7 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
                 messages: [
                     {
                         role: "system" as const,
-                        content: `
-You are an AI voice interviewer for the role of ${jobRole}.
-Ask the following questions one at a time in order:
-${JSON.stringify(questionStrings)}
-
-Rules:
-- Wait for the candidate to finish before continuing
-- Give brief feedback after each answer
-- Encourage retries when needed
-- End with a short summary and encouragement
-`.trim(),
+                        content: vapiPrompt(jobRole, questionStrings),
                     },
                 ],
             },

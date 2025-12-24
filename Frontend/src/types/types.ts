@@ -1,6 +1,6 @@
 export type ViolationType = "TAB_SWITCH" | "FULLSCREEN_EXIT" | null;
 
-export interface interview {
+export interface Interview {
     jobId: number;
     jobRole: string;
     interviewType: string;

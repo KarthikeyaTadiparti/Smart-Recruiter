@@ -14,18 +14,18 @@ import { useVapi } from "@/hooks/useVapi";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import { _getInterview } from "@/redux/actions/interview-actions";
 import { _saveConversation } from "@/redux/actions/feedback-actions";
-import { interview as InterviewType } from "@/types/types";
+import { Interview as InterviewType } from "@/types/types";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 
 export default function Interview() {
     const { id: jobId } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     const userData = useAppSelector((state) => state.auth.userData);
     const { fetch } = useAppSelector((state) => state.interview.loading);
     const { post } = useAppSelector((state) => state.feedback.loading);
-    const dispatch = useAppDispatch();
 
     const [started, setStarted] = useState(false);
     const [ended, setEnded] = useState(false);
@@ -36,8 +36,7 @@ export default function Interview() {
     const [isSpeaking, setIsSpeaking] = useState(false);
 
     const { videoRef, error } = useCamera(started, ended, setIsVideoOn);
-    const { tabSwitches, violation, setViolation, enterFullscreen } =
-        useProctoring(started, ended);
+    const { tabSwitches, violation, setViolation, enterFullscreen } = useProctoring(started, ended);
     const { timeLeft, isTimeUp } = useInterviewTimer(
         started,
         ended,
@@ -46,6 +45,7 @@ export default function Interview() {
 
     const { startVapi, stopVapi, conversation } = useVapi(setIsSpeaking);
 
+    // --- fetches the interview details ---
     useEffect(() => {
         const fetchInterview = async () => {
             const { payload } = await dispatch(
@@ -59,7 +59,7 @@ export default function Interview() {
         fetchInterview();
     }, [jobId, dispatch, navigate]);
 
-
+    // --- stops the interview when time is up ---
     useEffect(() => {
         if (isTimeUp && !ended) {
             stopInterview();
@@ -91,13 +91,13 @@ export default function Interview() {
         try {
             const { payload } = await dispatch(
                 _saveConversation({
-                    data: { jobId, conversation, tabSwitches },
+                    data: { jobId, conversation, tabSwitches, questions: interview?.questions },
                     navigate,
                 })
             );
 
             if (payload?.data?.status) {
-                navigate(`/candidate/feedback/${payload.data.application.applicationId}`);
+                navigate(`/candidate/my-interviews/${payload.data.application.applicationId}`);
             } else {
                 toast.error(payload?.data?.message || "Failed to save interview session");
             }
