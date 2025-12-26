@@ -11,6 +11,7 @@ import {
 import wrapAsync from "../utils/wrap-async.ts";
 import { Request, Response } from "express";
 import ExpressError from "../middlewares/errorhandler.ts";
+import { safeAverage } from "../utils/utils.ts";
 
 export const createApplication = wrapAsync(
     async (req: Request, res: Response) => {
@@ -158,14 +159,36 @@ export const getApplicationsByCandidate = wrapAsync(
         }
 
         const applications = await getApplicationsByCandidateId(id);
+        const interviewsAttended = applications.length;
+
+        let technicalScore = 0;
+        let communicationScore = 0;
+        let confidenceScore = 0;
+
+        for (const application of applications) {
+            technicalScore += application.technicalScore;
+            communicationScore += application.communicationScore;
+            confidenceScore += application.confidenceScore;
+        }
+
+        const avgTechnicalScore = safeAverage(technicalScore, interviewsAttended);
+        const avgCommunicationScore = safeAverage(communicationScore, interviewsAttended);
+        const avgConfidenceScore = safeAverage(confidenceScore, interviewsAttended);
 
         return res.status(200).json({
             status: true,
             message: "Candidate applications retrieved successfully",
             applications,
+            metrics: {
+                interviewsAttended,
+                avgTechnicalScore,
+                avgCommunicationScore,
+                avgConfidenceScore,
+            },
         });
     }
 );
+
 
 export const getApplicationsByJob = wrapAsync(
     async (req: Request, res: Response) => {

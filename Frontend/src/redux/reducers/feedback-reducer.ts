@@ -1,8 +1,9 @@
 import { Application, Candidate } from "@/types/types";
 import { createSlice } from "@reduxjs/toolkit";
-import { _getFeedback, _getFeedbacksByJobId, _saveConversation } from "../actions/feedback-actions";
+import { _getFeedback, _getFeedbacksByCandidateId, _getFeedbacksByJobId, _saveConversation } from "../actions/feedback-actions";
 
 interface FeedbackState {
+    // --- remove it ---
     application: Application | null;
     candidate: Candidate | null;
     loading: {
@@ -28,6 +29,7 @@ const feedbackSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            // get Feedback by id
             .addCase(_getFeedback.pending, (state) => {
                 state.loading.fetch = true;
             })
@@ -41,6 +43,7 @@ const feedbackSlice = createSlice({
                 state.error = action.error.message;
             })
 
+            // get Feedbacks by job id
             .addCase(_getFeedbacksByJobId.pending, (state) => {
                 state.loading.fetch = true;
             })
@@ -52,11 +55,25 @@ const feedbackSlice = createSlice({
                 state.error = action.error.message;
             })
 
+            // get Feedbacks by candidate id
+            .addCase(_getFeedbacksByCandidateId.pending, (state) => {
+                state.loading.fetch = true;
+            })
+            .addCase(_getFeedbacksByCandidateId.fulfilled, (state) => {
+                state.loading.fetch = false;
+            })
+            .addCase(_getFeedbacksByCandidateId.rejected, (state, action) => {
+                state.loading.fetch = false;
+                state.error = action.error.message;
+            })
+
+            // save conversation
             .addCase(_saveConversation.pending, (state) => {
                 state.loading.post = true;
             })
-            .addCase(_saveConversation.fulfilled, (state, action) => {
+            .addCase(_saveConversation.fulfilled, (state) => {
                 state.loading.post = false;
+                // --- remove it ---
                 // state.application = action.payload.data.application;
                 // state.candidate = action.payload.data.candidate;
             })

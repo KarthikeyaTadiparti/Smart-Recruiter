@@ -55,6 +55,7 @@ export interface Application {
     applicationId: number;
     candidateId: number;
     jobId: number;
+    jobRole: string;
     technicalScore: string;
     communicationScore: string;
     confidenceScore: string;
@@ -75,4 +76,17 @@ export interface Candidate {
 export interface FeedbackData {
     application: Application;
     candidate: Candidate;
+}
+
+export type Metric = {
+    title: string;
+    value: string | number;
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+};
+
+export type CandidateMetrics = {
+    avgTechnicalScore: string;
+    avgCommunicationScore: string;
+    avgConfidenceScore: string;
+    interviewsAttended: number;
 }

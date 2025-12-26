@@ -1,9 +1,10 @@
 import db from "../config/db.ts";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { applications } from "../schema/applications-schema.ts";
 import { users } from "../schema/users-schema.ts";
 import { Application } from "../types/interview.ts";
 import ExpressError from "../middlewares/errorhandler.ts";
+import { jobs } from "../schema/jobs-schema.ts";
 
 export async function addApplication(application: Application) {
     const [response] = await db
@@ -48,10 +49,21 @@ export async function getApplicationsByCandidateId(candidateId: number) {
         throw new ExpressError(400, "Invalid candidate id");
     }
 
-    const [candidateApplications] = await db
-        .select()
+    const candidateApplications = await db
+        .select({
+            applicationId : applications.applicationId,
+            jobRole : jobs.jobRole,
+            technicalScore : applications.technicalScore,
+            communicationScore : applications.communicationScore,
+            confidenceScore : applications.confidenceScore,
+            overallScore : applications.overallScore,
+            feedback : applications.feedback,
+            createdAt : applications.createdAt,
+        })
         .from(applications)
-        .where(eq(applications.candidateId, candidateId));
+        .innerJoin(jobs, eq(applications.jobId, jobs.jobId))
+        .where(eq(applications.candidateId, candidateId))
+        .orderBy(desc(applications.createdAt));
 
     return candidateApplications;
 }

@@ -1,5 +1,4 @@
-// CandidateDashboard.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -16,86 +15,71 @@ import {
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { _getFeedbacksByCandidateId } from "@/redux/actions/feedback-actions";
+import { useNavigate } from "react-router-dom";
+import { Application, CandidateMetrics, Metric } from "@/types/types";
+import { Spinner } from "@/components/ui/spinner";
+import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
+import { formatDate, limitWords } from "@/lib/utils";
+import { RootState } from "@/redux/reducers";
 
-type Metric = {
-  title: string;
-  value: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-};
 
-type Interview = {
-  id: string;
-  title: string;
-  date: string;
-  status: string;
-  technical: string;
-  communication: string;
-  confidence: string;
-  feedback: string;
-};
+export default function CandidateDashboard() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { userData } = useAppSelector((state:RootState) => state.auth);
+  const { loading } = useAppSelector((state:RootState) => state.feedback);
 
-const metrics: Metric[] = [
-  {
-    title: "Total Interviews",
-    value: "12",
-    icon: Users,
-  },
-  {
-    title: "Average \n Technical Score",
-    value: "8.2",
-    icon: CodeXml,
-  },
-  {
-    title: "Average \n Communication Score",
-    value: "7.7",
-    icon: MessageCircleMore,
-  },
-  {
-    title: "Average \n Confidence Score",
-    value: "8.2",
-    icon: CircleCheckBig,
-  },
-];
+  const [candidateApplications, setCandidateApplications] = useState<Application[]>([]);
+  const [candidateMetrics, setCandidateMetrics] = useState<CandidateMetrics | null>(null);
 
-const recentInterviews: Interview[] = [
-  {
-    id: "ivw-1",
-    title: "Senior Frontend Developer",
-    date: "Aug 1, 2025",
-    status: "Completed",
-    technical: "8.2",
-    communication: "7.7",
-    confidence: "8.2",
-    feedback:
-      "Excellent problem-solving skills demonstrated with the React component challenge. Communication was clear and concise. Could elaborate more on system design choices",
-  },
-  {
-    id: "ivw-2",
-    title: "Senior Frontend Developer",
-    date: "Aug 1, 2025",
-    status: "Completed",
-    technical: "8.2",
-    communication: "7.7",
-    confidence: "8.2",
-    feedback:
-      "Excellent problem-solving skills demonstrated with the React component challenge. Communication was clear and concise. Could elaborate more on system design choices",
-  },
-  {
-    id: "ivw-3",
-    title: "Senior Frontend Developer",
-    date: "Aug 1, 2025",
-    status: "Completed",
-    technical: "8.2",
-    communication: "7.7",
-    confidence: "8.2",
-    feedback:
-      "Excellent problem-solving skills demonstrated with the React component challenge. Communication was clear and concise. Could elaborate more on system design choices",
-  },
-];
+  useEffect(() => {
+    const fetch = async () => {
+      if (userData.id) {
+        try {
+          const { payload } = await dispatch(_getFeedbacksByCandidateId({ id: userData.id, navigate }));
+          setCandidateMetrics(payload.data.metrics);
+          setCandidateApplications(payload.data.applications);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    fetch();
+  }, [dispatch, userData.id, navigate]);
 
-export default function CandidateDashboard(){
+  const metrics: Metric[] = [
+    {
+      title: "Total Interviews",
+      value: candidateMetrics?.interviewsAttended?.toString() || "0",
+      icon: Users,
+    },
+    {
+      title: "Average \n Technical Score",
+      value: candidateMetrics?.avgTechnicalScore || "0",
+      icon: CodeXml,
+    },
+    {
+      title: "Average \n Communication Score",
+      value: candidateMetrics?.avgCommunicationScore || "0",
+      icon: MessageCircleMore,
+    },
+    {
+      title: "Average \n Confidence Score",
+      value: candidateMetrics?.avgConfidenceScore || "0",
+      icon: CircleCheckBig,
+    },
+  ];
+
   return (
     <div className="flex flex-1 flex-col gap-4">
+
+      {(loading.fetch && candidateApplications.length === 0)
+        && (<div className="absolute inset-0 z-60 grid place-items-center bg-white/70">
+          <Spinner className="size-8" />
+        </div>)}
+
+      {/* metrics */}
       <section className="flex flex-col gap-4 my-4">
         <div>
           <h1 className="text-xl font-semibold">Overview</h1>
@@ -129,35 +113,43 @@ export default function CandidateDashboard(){
         </div>
       </section>
 
+      {/* recent interviews */}
       <section className="flex flex-col gap-4 my-4">
         <div className="flex flex-row justify-between items-center">
           <div>
-            <h1 className="text-xl font-semibold">Recently Attended Interviews</h1>
+            <h1 className="text-xl font-semibold">
+              Recently Attended Interviews
+            </h1>
             <p className="text-muted-foreground">
               Track your upcoming and past interviews
             </p>
           </div>
-          <Button>View All</Button>
+          <Button onClick={() => navigate("/candidate/my-interviews")}>View All</Button>
         </div>
 
         <div className="grid grid-cols-2 gap-4 w-full">
-          {recentInterviews.map((item) => (
-            <Card className="rounded-sm w-full" key={item.id} aria-label={item.title}>
+          {candidateApplications.map((item) => (
+            <Card
+              className="rounded-sm w-full"
+              key={item.applicationId}
+              aria-label={item.jobRole}
+            >
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle className="font-semibold text-lg">
-                    {item.title}
+                    {item.jobRole}
                   </CardTitle>
                   <Badge
                     variant="outline"
                     className="bg-green-100 text-green-700 px-2 py-1 text-sm rounded-full"
                   >
-                    {item.status}
+                    Completed
                   </Badge>
                 </div>
 
                 <CardDescription className="flex gap-1 items-center">
-                  <CalendarFold className="h-4" aria-hidden /> {item.date}
+                  <CalendarFold className="h-4" aria-hidden />{" "}
+                  {formatDate(item.createdAt)}
                 </CardDescription>
               </CardHeader>
 
@@ -167,35 +159,47 @@ export default function CandidateDashboard(){
                     <div className="flex-1">
                       <h3 className="text-md font-semibold">Technical</h3>
                       <p className="text-md text-muted-foreground">
-                        {item.technical}/10
+                        {item.technicalScore}/10
                       </p>
                     </div>
 
                     <div className="flex-1">
                       <h3 className="text-md font-semibold">Communication</h3>
                       <p className="text-md text-muted-foreground">
-                        {item.communication}/10
+                        {item.communicationScore}/10
                       </p>
                     </div>
 
                     <div className="flex-1">
                       <h3 className="text-md font-semibold">Confidence</h3>
                       <p className="text-md text-muted-foreground">
-                        {item.confidence}/10
+                        {item.confidenceScore}/10
                       </p>
                     </div>
                   </div>
 
                   <div>
                     <h3 className="text-md font-semibold">Feedback Summary</h3>
-                    <p className="text-md text-muted-foreground">{item.feedback}</p>
+                    <p className="text-md text-muted-foreground">
+                      {limitWords(item.feedback, 30)}
+                    </p>
                   </div>
 
-                  <Button className="w-auto self-end">View Details</Button>
+                  <Button
+                    className="w-auto self-end"
+                    onClick={() => navigate(`/candidate/my-interviews/${item.applicationId}`)}
+                  >
+                    View Details
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
+          {candidateApplications.length === 0 && !loading.fetch && (
+            <div className="col-span-2 text-center py-10 text-muted-foreground">
+              No interview feedbacks found yet.
+            </div>
+          )}
         </div>
       </section>
     </div>
