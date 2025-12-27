@@ -1,7 +1,6 @@
 import * as React from "react"
-import { Home, ArrowBigUpDash, Search, FileText } from "lucide-react"
+import { Home, Search, FileText } from "lucide-react"
 import { useLocation, Link } from "react-router-dom"
-
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -17,6 +16,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAppSelector } from "@/hooks/use-redux"
+import Logo from "./Logo"
 
 const items = [
   { title: "Dashboard", url: "/candidate", icon: Home },
@@ -28,12 +28,13 @@ export function CandidateSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { pathname } = useLocation()
   const { userData } = useAppSelector((state) => state.auth)
   const user = userData;
-  const { open } = useSidebar() 
+  const { open } = useSidebar()
+
 
   return (
     <Sidebar collapsible="icon" {...props} className="z-50">
-      <SidebarHeader className="flex flex-row justify-center items-center">
-        <ArrowBigUpDash className="p-1 w-[35px] h-[35px] bg-primary text-white rounded-md" />
+      <SidebarHeader className="flex flex-row  items-center justify-center">
+        <Logo />
         {open && <h1 className="text-xl font-bold py-3 text-center">Smart Recruiter</h1>}
       </SidebarHeader>
 

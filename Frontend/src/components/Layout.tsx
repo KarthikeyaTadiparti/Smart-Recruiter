@@ -88,7 +88,7 @@ export default function Layout() {
           </header>
 
           {/* Main content */}
-          <div className="relative flex flex-1 p-6 pt-4 bg-(--color-primary-foreground)">
+          <div className="relative flex flex-1 p-6 pt-4 bg-primary-foreground">
             <Outlet />
           </div>
         </SidebarInset>

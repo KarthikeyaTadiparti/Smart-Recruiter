@@ -1,12 +1,8 @@
 import * as React from "react"
 import {
   Home,
-  ArrowBigUpDash,
   Plus,
   FileText,
-  GalleryVerticalEnd,
-  AudioWaveform,
-  Command,
 } from "lucide-react"
 import { useLocation } from "react-router-dom"
 import { Link } from "react-router-dom"
@@ -17,7 +13,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -27,6 +22,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useAppSelector } from "@/hooks/use-redux"
 import { useSidebar } from "@/components/ui/sidebar"
+import Logo from "./Logo"
 
 // Menu items.
 const items = [
@@ -56,8 +52,8 @@ export function RecruiterSidebar({ ...props }: React.ComponentProps<typeof Sideb
 
   return (
     <Sidebar collapsible="icon" {...props} className="z-50">
-      <SidebarHeader className="flex flex-row justify-center items-center">
-        <ArrowBigUpDash className="p-1 w-[35px] h-[35px] bg-primary text-white rounded-md" />
+      <SidebarHeader className="flex flex-row  items-center justify-center">
+        <Logo />
         {open && <h1 className="text-xl font-bold py-3 text-center">Smart Recruiter</h1>}
       </SidebarHeader>
 
