@@ -13,8 +13,8 @@ import { toast } from "sonner";
 import Signup from "./pages/auth/Signup";
 import Explore from "./pages/candidate/Explore";
 import MyInterviews from "./pages/candidate/MyInterviews";
-import Test from "./pages/Test";
-import Cam from "./pages/Cam";
+// import Test from "./pages/Test";
+// import Cam from "./pages/Cam";
 // import VapiWidget from "./pages/VapiWidget";
 import InterviewQuestions from "./pages/recruiter/InterviewQuestions";
 import Job from "./pages/candidate/Job";
@@ -67,11 +67,11 @@ const ProtectedAuthRoute = ({ element }: { element: React.ReactNode }) => {
 
 
 function App() {
-  const { userData } = useAppSelector((state) => state.auth);
+  const { userData, company } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     console.log("user data : ", userData);
-    console.log("company details : ", userData.company);
+    console.log("company details : ", company);
   }, [userData]);
 
   return (
@@ -102,8 +102,6 @@ function App() {
           <Route path="my-interviews" element={<MyInterviews />} />
           <Route path="my-interviews/:id" element={<Feedback />} />
         </Route>
-
-
       </Routes>
 
     </>

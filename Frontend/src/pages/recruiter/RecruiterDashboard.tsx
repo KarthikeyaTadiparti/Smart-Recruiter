@@ -1,85 +1,42 @@
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "../../components/ui/card";
-import { Users, Clock8, CircleCheckBig, TrendingUp, Code } from "lucide-react";
+import { Users, Clock8, TrendingUp, Code, BriefcaseBusiness } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import { useNavigate } from "react-router-dom";
-import { _createCompany } from "@/redux/actions/auth-actions";
-import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogOverlay,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { _getJobsByRecruiterId } from "@/redux/actions/job-actions";
+import { limitWords } from "@/lib/utils";
+import useCompany from "@/hooks/useCompany";
+import CompanyDialog from "@/components/CompanyDialog";
+import { Spinner } from "@/components/ui/spinner";
 
-const metrics = [
+const getMetricData = (recruiterMetrics: any) => [
   {
-    title: "Total Interviews",
-    value: "247",
+    title: "Interviews Created",
+    value: recruiterMetrics?.jobsCreated || 0,
+    icon: BriefcaseBusiness,
+  },
+  {
+    title: "Total Candidates",
+    value: recruiterMetrics?.totalCandidatesInterviewed || 0,
     icon: Users,
   },
   {
-    title: "On-going Interviews",
-    value: "18",
-    icon: Clock8,
-  },
-  {
-    title: "Completed Interviews",
-    value: "229",
-    icon: CircleCheckBig,
-  },
-  {
     title: "Avg Candidate Score",
-    value: "8.2",
+    value: recruiterMetrics?.avgOverallCandidatesScore?.toFixed(1) || "0.0",
     icon: TrendingUp,
   },
-];
-
-const recentInterviews = [
   {
-    id: "intv-1",
-    title: "Senior Frontend Developer",
-    type: "Behavioural",
-    status: "Active",
-    techStack: ["React", "Next.js", "Tailwind CSS"],
-    candidates: "2",
-  },
-  {
-    id: "intv-2",
-    title: "Senior Frontend Developer",
-    type: "Behavioural",
-    status: "Active",
-    techStack: ["React", "Next.js", "Tailwind CSS"],
-    candidates: "2",
-  },
-  {
-    id: "intv-3",
-    title: "Senior Frontend Developer",
-    type: "Behavioural",
-    status: "Active",
-    techStack: ["React", "Next.js", "Tailwind CSS"],
-    candidates: "2",
-  },
-  {
-    id: "intv-4",
-    title: "Senior Frontend Developer",
-    type: "Behavioural",
-    status: "Active",
-    techStack: ["React", "Next.js", "Tailwind CSS"],
-    candidates: "2",
+    title: "Interview Minutes",
+    value: recruiterMetrics?.interviewMinutes || 0,
+    icon: Clock8,
   },
 ];
 
@@ -87,101 +44,53 @@ export default function RecruiterDashboard() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const authData = useAppSelector((state) => state.auth)
-  const loading = authData.loading.fetchCompany;
   const userData = authData.userData;
-  const company = userData.company;
 
-  const [showCompanyDialog, setShowCompanyDialog] = useState(false);
-  const [companyForm, setCompanyForm] = useState({
-    name: "",
-    description: "",
-    website: "",
-  });
+  const [recruiterMetrics, setRecruiterMetrics] = useState<any>(null);
+  const [recentInterviews, setRecentInterviews] = useState<any>([]);
+  const metrics = getMetricData(recruiterMetrics);
+  const jobsLoading = useAppSelector((state) => state.job.loading.fetchRecruiterJobs);
+
+  const { loading, showCompanyDialog, companyForm, setCompanyForm, setShowCompanyDialog } = useCompany(authData);
+
 
   useEffect(() => {
-    if (userData?.role === "recruiter" && !company?.id) {
-      setShowCompanyDialog(true);
+    const fetchJobs = async () => {
+      if (userData?.id) {
+        try {
+          const { payload } = await dispatch(_getJobsByRecruiterId({ id: userData.id, navigate }));
+          setRecruiterMetrics(payload?.data?.metrics);
+          setRecentInterviews(payload?.data?.jobs);
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
-  }, [userData, company]);
+    fetchJobs();
+  }, [userData, dispatch, navigate]);
 
-  async function handleCompanySubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!companyForm.name || !companyForm.description || !companyForm.website) return;
-    const { payload }: any = await dispatch(_createCompany({ data: companyForm, navigate }));
-
-    if (payload?.data?.status) {
-      toast.success(payload.data.message);
-      setShowCompanyDialog(false);
-    }
-    else {
-      toast.error(payload?.data?.message || "Failed to create interview");
-    }
+  if (showCompanyDialog) {
+    {/* company dialog */ }
+    return (<CompanyDialog
+      loading={loading}
+      showCompanyDialog={showCompanyDialog}
+      companyForm={companyForm}
+      setCompanyForm={setCompanyForm}
+      setShowCompanyDialog={setShowCompanyDialog}
+    />)
   }
+
+
   return (
     <div className="flex flex-1 flex-col gap-4 relative">
-      {showCompanyDialog && (
-        <Dialog open={showCompanyDialog} onOpenChange={setShowCompanyDialog}>
-          <DialogContent className="[&>button]:hidden" onEscapeKeyDown={(e) => e.preventDefault()}
-            onPointerDownOutside={(e) => e.preventDefault()}>
-            <DialogHeader>
-              <DialogTitle>Company Details</DialogTitle>
-              <DialogDescription>
-                Please provide your company details to continue using the recruiter
-                dashboard.
-              </DialogDescription>
-            </DialogHeader>
 
-            <form onSubmit={handleCompanySubmit} className="space-y-4 mt-2">
-              <div className="space-y-2">
-                <Label htmlFor="company-name">Company Name</Label>
-                <Input
-                  id="company-name"
-                  value={companyForm.name}
-                  onChange={(e) =>
-                    setCompanyForm((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  placeholder="Acme Inc."
-                  required
-                />
-              </div>
+      {/* Spinner */}
+      {(jobsLoading && recentInterviews.length === 0)
+        && (<div className="absolute inset-0 z-60 grid place-items-center bg-white/70">
+          <Spinner className="size-8" />
+        </div>)}
 
-              <div className="space-y-2">
-                <Label htmlFor="company-description">Description</Label>
-                <textarea
-                  id="company-description"
-                  value={companyForm.description}
-                  onChange={(e) =>
-                    setCompanyForm((prev) => ({ ...prev, description: e.target.value }))
-                  }
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder="Short description about your company"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="company-website">Website</Label>
-                <Input
-                  id="company-website"
-                  type="url"
-                  value={companyForm.website}
-                  onChange={(e) =>
-                    setCompanyForm((prev) => ({ ...prev, website: e.target.value }))
-                  }
-                  placeholder="https://www.example.com"
-                  required
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Saving..." : "Save"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* Overview */}
       <section className="flex flex-col gap-4 my-4">
         <div>
           <h1 className="text-xl font-semibold">Overview</h1>
@@ -189,9 +98,8 @@ export default function RecruiterDashboard() {
             Key metrics for your recruitment activities
           </p>
         </div>
-
         <div className="flex gap-4">
-          {metrics.map((item) => {
+          {metrics?.map((item: any) => {
             const Icon = item.icon;
             return (
               <Card
@@ -215,6 +123,7 @@ export default function RecruiterDashboard() {
         </div>
       </section>
 
+      {/* Interviews */}
       <section className="flex flex-col gap-4 my-4">
         <div className="flex flex-row justify-between items-center">
           <div>
@@ -223,66 +132,88 @@ export default function RecruiterDashboard() {
               Manage and track your latest interview sessions
             </p>
           </div>
-          <Button>View All</Button>
+          <Button onClick={() => navigate("/recruiter/manage-interview")}>View All</Button>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          {recentInterviews.map((item) => (
-            <Card className="rounded-sm w-full" key={item.id} aria-label={item.title}>
+          {recentInterviews.map((item: any) => (
+            <Card className="rounded-sm w-full" key={item.jobId} aria-label={item.jobRole}>
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <CardTitle className="font-semibold text-lg">
-                    {item.title}
-                  </CardTitle>
+                  <div className="flex flex-col gap-1">
+                    <CardTitle className="font-semibold text-lg">
+                      {item.jobRole}
+                    </CardTitle>
+                    <div className="flex gap-4 mt-1 text-slate-500 text-xs">
+                      <span className="flex items-center gap-1">
+                        <Clock8 className="h-3 w-3" /> {item.experience} years exp
+                      </span>
+                      <span className="flex items-center gap-1">
+                        {item.location}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        Expires: {new Date(item.closedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+
                   <Badge
                     variant="outline"
                     className="bg-green-100 text-green-700 px-2 py-1 text-sm rounded-full"
                   >
-                    {item.status}
+                    Active
                   </Badge>
                 </div>
 
-                <CardDescription className="flex gap-1 items-center">
-                  <Users className="h-4" aria-hidden /> {item.candidates} candidates
+                <CardDescription className="flex flex-col gap-1 h-[50px] text-black">
+                  <span className="text-sm text-balance">{limitWords(item.description, 20)}</span>
                 </CardDescription>
               </CardHeader>
 
               <CardContent>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   <div className="flex gap-1 items-center">
                     <Code className="h-4 text-muted-foreground" aria-hidden />
                     <span className="text-sm font-medium">Tech Stack:</span>
                   </div>
 
                   <div className="flex gap-2 items-center flex-wrap">
-                    {item.techStack.map((tech, idx) => (
+                    {item.techStack.split(",").map((tech: string, idx: number) => (
                       <Badge
-                        key={`${item.id}-${tech}-${idx}`}
+                        key={`${item.jobId}-${tech}-${idx}`}
                         className="bg-gray-100 text-gray-700 px-2 py-1 text-sm rounded-full"
                       >
-                        {tech}
+                        {tech.trim()}
                       </Badge>
                     ))}
                   </div>
 
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-muted-foreground">Type: {item.type}</p>
-
-                    {/* keep the primary action visible on larger screens */}
-                    <div className="hidden md:block">
-                      <Button>View Details</Button>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Type:</span> {item.interviewType}
                     </div>
+                    <div>
+                      <span className="text-muted-foreground">Duration:</span> {item.interviewDuration} mins
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Questions:</span> {item.noOfQuestions}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end items-center">
+                    <Button onClick={() => navigate(`/recruiter/manage-interview/${item.jobId}`)}>View Details</Button>
                   </div>
                 </div>
               </CardContent>
-
-              <CardFooter className="flex justify-end">
-                {/* footer action always available (useful for small screens) */}
-                <Button variant="ghost">View Details</Button>
-              </CardFooter>
             </Card>
           ))}
+          {recentInterviews.length === 0 && !jobsLoading && (
+            <div className="col-span-2 text-center py-10 text-muted-foreground">
+              No interviews found yet.
+            </div>
+          )}
         </div>
+
       </section>
     </div>
   );

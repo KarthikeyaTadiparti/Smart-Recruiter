@@ -4,6 +4,7 @@ import {
     _generateQuestions,
     _getAllJobs,
     _getJob,
+    _getJobsByRecruiterId,
 } from "@/redux/actions/job-actions";
 
 
@@ -18,9 +19,10 @@ interface JobInitialStateType {
         fetch: boolean;
         generateQuestions: boolean;
         storeQuestions: boolean;
+        fetchRecruiterJobs: boolean;
     };
     error: string | null;
-    jobQuestions: JobQuestion[];
+    jobQuestions: JobQuestion[]
 }
 
 // --- initial state ---
@@ -30,6 +32,7 @@ const initialState: JobInitialStateType = {
         fetch: false,
         generateQuestions: false,
         storeQuestions: false,
+        fetchRecruiterJobs: false,
     },
     error: null,
     jobQuestions: [],
@@ -93,7 +96,19 @@ const jobSlice = createSlice({
             })
             .addCase(_getJob.rejected, (state) => {
                 state.loading.fetch = false;
+            })
+
+            //fetchRecruiterJobs
+            .addCase(_getJobsByRecruiterId.pending, (state) => {
+                state.loading.fetchRecruiterJobs = true;
+            })
+            .addCase(_getJobsByRecruiterId.fulfilled, (state) => {
+                state.loading.fetchRecruiterJobs = false;
+            })
+            .addCase(_getJobsByRecruiterId.rejected, (state) => {
+                state.loading.fetchRecruiterJobs = false;
             });
+
     },
 });
 

@@ -20,3 +20,9 @@ export const _getJob = createAsyncThunk<any, any>("getJob", async (data: any) =>
     const response: any = await Get(`/jobs/`, data.id, data.navigate);
     return response;
 })
+
+export const _getJobsByRecruiterId = createAsyncThunk<any, any>("getJobsByRecruiterId", async (data: any) => {
+    const response: any = await Get(`/jobs/recruiter/`, data.id, data.navigate);
+    return response;
+});
+

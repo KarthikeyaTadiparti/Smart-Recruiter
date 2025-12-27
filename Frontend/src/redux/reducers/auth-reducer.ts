@@ -14,13 +14,14 @@ interface AuthInitialStateType {
         name: string | null
         email: string | null
         role: string | null
-        company: {
-            id: number | null,
-            name: string | null,
-            website: string | null,
-            description: string | null,
-        }
     }
+    company: {
+        id: number | null,
+        name: string | null,
+        website: string | null,
+        description: string | null,
+    }
+
 }
 const initialState: AuthInitialStateType = {
     loading: {
@@ -35,14 +36,15 @@ const initialState: AuthInitialStateType = {
         name: null,
         email: null,
         role: null,
-        company: {
-            id: null,
-            name: null,
-            website: null,
-            description: null
-        }
+    },
+    company: {
+        id: null,
+        name: null,
+        website: null,
+        description: null
     }
 }
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -56,6 +58,7 @@ const authSlice = createSlice({
             .addCase(_userLogin.fulfilled, (state, action) => {
                 state.loading.login = false
                 state.userData = action.payload.data.user;
+                state.company = action.payload.data.company;
             })
             .addCase(_userLogin.rejected, (state, action) => {
                 state.loading.login = false
@@ -68,6 +71,7 @@ const authSlice = createSlice({
             .addCase(_userSignup.fulfilled, (state, action) => {
                 state.loading.signup = false
                 state.userData = action.payload.data.user
+                state.company = action.payload.data.company;
             })
             .addCase(_userSignup.rejected, (state, action) => {
                 state.loading.signup = false
@@ -80,6 +84,7 @@ const authSlice = createSlice({
             .addCase(_userLogout.fulfilled, (state) => {
                 state.loading.logout = false
                 state.userData = initialState.userData
+                state.company = initialState.company;
             })
             .addCase(_userLogout.rejected, (state, action) => {
                 state.loading.logout = false
@@ -92,9 +97,9 @@ const authSlice = createSlice({
             })
             .addCase(_createCompany.fulfilled, (state, action) => {
                 state.loading.fetchCompany = false
-                state.userData.company = action.payload.data.company
+                state.company = action.payload.data.company
             })
-            .addCase(_createCompany.rejected, (state,action) => {
+            .addCase(_createCompany.rejected, (state, action) => {
                 state.loading.fetchCompany = false
                 state.error = action.error.message || "Please Try Again"
 

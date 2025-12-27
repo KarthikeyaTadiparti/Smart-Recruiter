@@ -52,8 +52,7 @@ function CreateInterview() {
       no_of_questions: "",
     },
   });
-  const { userData } = useAppSelector((state) => state.auth);
-  const company = userData.company;
+  const { company } = useAppSelector((state) => state.auth);
 
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.job);
@@ -83,7 +82,15 @@ function CreateInterview() {
 
 
   return (
-    <main className="flex flex-1 flex-col gap-4 relative p-4">
+    <main className="flex flex-1 flex-col gap-4 relative py-4">
+      <div className="flex flex-row justify-between items-center mb-6">
+        <div>
+          <h1 className="text-xl font-semibold">New Job Posting</h1>
+          <p className="text-muted-foreground">
+            Provide the role details, required skills, and interview details to publish your job opening
+          </p>
+        </div>
+      </div>
 
       {/* Spinner */}
       {loading.generateQuestions && (
@@ -93,11 +100,6 @@ function CreateInterview() {
       )}
 
       <Card className="w-3/5 mx-auto px-6 py-8">
-        <CardHeader className="px-0">
-          <CardTitle className="text-xl font-medium">New Job Posting</CardTitle>
-          <CardDescription className="text-gray-500 text-sm">Provide the role details, required skills, and interview details to publish your job opening.</CardDescription>
-        </CardHeader>
-
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}

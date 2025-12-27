@@ -21,21 +21,17 @@ export const handleUserSignup = wrapAsync(async (req: Request, res: Response) =>
         throw new ExpressError(500, "Failed to create user");
     }
 
-    let responseUser = {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        company: {
-            id: null,
-        },
-    };
-
     genJwt(res, newUser.id);
 
     return res.status(201).json({
         status: true,
-        user: responseUser,
+        user: {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            role: newUser.role,
+        },
+        company: null,
         message: "User registered successfully!",
     });
 });
@@ -57,15 +53,21 @@ export const handleUserLogin = wrapAsync(async (req: Request, res: Response) => 
         name: user.name,
         email: user.email,
         role: user.role,
-        company: {
-            id: user.companyId,
-        }
     };
 
+    let responseCompany = user.companyId ? { id: user.companyId } : null;
+
     if (user.role === "recruiter") {
-        const recruiterCompany = await getRecruiterCompany(user.id);
-        if (recruiterCompany)
-            responseUser = recruiterCompany;
+        const recruiterData = await getRecruiterCompany(user.id);
+        if (recruiterData) {
+            responseUser = {
+                id: recruiterData.id,
+                name: recruiterData.name,
+                email: recruiterData.email,
+                role: recruiterData.role,
+            };
+            responseCompany = recruiterData.company;
+        }
     }
 
     genJwt(res, user.id);
@@ -73,6 +75,7 @@ export const handleUserLogin = wrapAsync(async (req: Request, res: Response) => 
     return res.status(200).json({
         status: true,
         user: responseUser,
+        company: responseCompany,
         message: "User logged in successfully!"
     });
 });

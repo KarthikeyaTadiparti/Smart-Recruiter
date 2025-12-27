@@ -1,10 +1,11 @@
 import db from "../config/db.ts";
-import { eq, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { jobs } from "../schema/jobs-schema.ts";
 import { companies } from "../schema/companies-schema.ts";
 import ExpressError from "../middlewares/errorhandler.ts";
 import { Question } from "../types/interview.ts";
 import { users } from "../schema/users-schema.ts";
+import { applications } from "../schema/applications-schema.ts";
 
 export async function addJob(
     job_role: string,
@@ -117,7 +118,31 @@ export async function fetchJobs(id: number) {
     return job;
 }
 
-export async function fetchInterviewQuestions(id : number){
+export async function fetchJobsByRecruiter(id: number) {
+    const jobsByRecruiter = await db
+        .select({
+            //job
+            jobId: jobs.jobId,
+            jobRole: jobs.jobRole,
+            description: jobs.description,
+            techStack: jobs.techStack,
+            experience: jobs.experience,
+            location: jobs.location,
+            closedAt: jobs.closedAt,
+            interviewType: jobs.interviewType,
+            interviewDuration: jobs.interviewDuration,
+            noOfQuestions: jobs.noOfQuestions,
+        })
+        .from(jobs)
+        .where(eq(jobs.recruiterId, id))
+        .orderBy(desc(jobs.createdAt));
+
+    return jobsByRecruiter;
+}
+
+
+
+export async function fetchInterviewQuestions(id: number) {
     const [job] = await db
         .select({
             jobId: jobs.jobId,
@@ -132,3 +157,19 @@ export async function fetchInterviewQuestions(id : number){
 
     return job;
 }
+
+export async function fetchRecruiterMetrics(recruiterId: number) {
+    const [metrics] = await db
+        .select({
+            jobsCreated: sql<number>`CAST(count(distinct ${jobs.jobId}) AS INTEGER)`,
+            totalCandidatesInterviewed: sql<number>`CAST(count(${applications.applicationId}) AS INTEGER)`,
+            avgOverallCandidatesScore: sql<number>`CAST(ROUND(COALESCE(avg(${applications.overallScore}), 0), 1) AS FLOAT)`,
+            interviewMinutes: sql<number>`CAST(COALESCE(sum(CASE WHEN ${applications.applicationId} IS NOT NULL THEN ${jobs.interviewDuration} ELSE 0 END), 0) AS INTEGER)`
+        })
+        .from(jobs)
+        .leftJoin(applications, eq(jobs.jobId, applications.jobId))
+        .where(eq(jobs.recruiterId, recruiterId));
+
+    return metrics;
+}
+

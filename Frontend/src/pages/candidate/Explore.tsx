@@ -201,7 +201,7 @@ function Explore() {
                                     className={`mt-6 w-full gap-2 ${
                                         closed
                                             ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                                            : "bg-slate-950 hover:bg-slate-800"
+                                            : "bg-primary hover:bg-primary/80"
                                     }`}
                                 >
                                     {closed ? "Closed" : "Join Interview"}
