@@ -72,7 +72,7 @@ function App() {
   useEffect(() => {
     console.log("user data : ", userData);
     console.log("company details : ", company);
-  }, [userData]);
+  }, [userData,company]);
 
   return (
     <>

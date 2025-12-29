@@ -30,6 +30,7 @@ function Signup() {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
     const { loading } = useAppSelector((state: RootState) => state.auth)
+
     const [signup, setSignup] = useState<Signup>({
         name: '',
         email: '',
@@ -70,6 +71,7 @@ function Signup() {
                         <TabsTrigger value="recruiter">Recruiter</TabsTrigger>
                     </TabsList>
 
+                    {/* Candidate Signup */}
                     <TabsContent value="candidate">
                         <Card>
                             <CardHeader>
@@ -136,6 +138,7 @@ function Signup() {
                         </Card>
                     </TabsContent>
 
+                    {/* Recruiter Signup */}
                     <TabsContent value="recruiter">
                         <Card>
                             <CardHeader>

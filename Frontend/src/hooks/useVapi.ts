@@ -82,11 +82,22 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
             }
         };
 
+        const onError = (error: any) => {
+            console.error("Vapi error:", error);
+
+            // Handle voice-provider ejects safely
+            if (error?.error?.type === "ejected") {
+                console.warn("Call ejected by voice provider");
+                setIsSpeaking(false);
+            }
+        };
+
         vapi.on("call-start", onCallStart);
         vapi.on("call-end", onCallEnd);
         vapi.on("speech-start", onSpeechStart);
         vapi.on("speech-end", onSpeechEnd);
         vapi.on("message", onMessage);
+        vapi.on("error", onError);
 
         return () => {
             vapi.off("call-start", onCallStart);
@@ -94,6 +105,7 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
             vapi.off("speech-start", onSpeechStart);
             vapi.off("speech-end", onSpeechEnd);
             vapi.off("message", onMessage);
+            vapi.off("error", onError);
             vapi.stop();
         };
     }, [setIsSpeaking]);
@@ -125,11 +137,12 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
                 provider: "deepgram" as const,
                 model: "nova-2" as const,
                 language: "en-US" as const,
+                endpointing: 500,
             },
 
             voice: {
-                provider: "playht" as const,
-                voiceId: "jennifer" as const,
+                provider: "openai" as const,
+                voiceId: "alloy" as const,
             },
 
             model: {

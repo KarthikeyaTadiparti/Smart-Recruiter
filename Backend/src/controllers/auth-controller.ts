@@ -42,11 +42,11 @@ export const handleUserLogin = wrapAsync(async (req: Request, res: Response) => 
 
     const user = await getUserByEmailAndRole(email, role);
     if (!user)
-        throw new ExpressError(403, "User does not exist!");
+        throw new ExpressError(401, "User does not exist!");
 
     const isPassword = await bcrypt.compare(password, user.password);
     if (!isPassword)
-        throw new ExpressError(403, "Invalid email or password!");
+        throw new ExpressError(401, "Invalid email or password!");
 
     let responseUser = {
         id: user.id,
