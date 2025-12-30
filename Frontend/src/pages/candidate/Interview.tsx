@@ -43,7 +43,7 @@ export default function Interview() {
         interview?.interviewDuration ?? 0
     );
 
-    const { startVapi, stopVapi, conversation } = useVapi(setIsSpeaking);
+    const { startVapi, stopVapi, getConversation } = useVapi(setIsSpeaking);
 
     // --- fetches the interview details ---
     useEffect(() => {
@@ -70,9 +70,9 @@ export default function Interview() {
     useEffect(() => {
         if (interview) {
             console.log("Interview:", interview);
-            console.log("Conversation:", conversation);
+            // console.log("Conversation:", getConversation());
         }
-    }, [interview, conversation]);
+    }, [interview]);
 
     const startInterview = () => {
         if (!userData?.name || !interview) return;
@@ -91,7 +91,7 @@ export default function Interview() {
         try {
             const { payload } = await dispatch(
                 _saveConversation({
-                    data: { jobId, conversation, tabSwitches, questions: interview?.questions },
+                    data: { jobId, conversation: getConversation(), tabSwitches, questions: interview?.questions },
                     navigate,
                 })
             );

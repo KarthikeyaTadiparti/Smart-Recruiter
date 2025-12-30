@@ -143,8 +143,8 @@ export const addInterviewQuestions = wrapAsync(
         const jobId = Number(id);
         const questions = req.body;
 
-        console.log("Questions : ", questions);
-        console.log("interview Id", id);
+        // console.log("Questions : ", questions);
+        // console.log("interview Id", id);
 
         const updatedInterview = await addQuestions(jobId, questions);
         return res.status(200).json({

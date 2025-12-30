@@ -81,7 +81,8 @@ export async function fetchAllJobs() {
         .innerJoin(
             companies,
             eq(jobs.companyId, companies.companyId)
-        );
+        )
+        .orderBy(desc(jobs.createdAt));
 
     return allJobs;
 }

@@ -45,7 +45,7 @@ function mapQuestionsToStrings(questions: Question[]): string[] {
 
 export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
     const vapiRef = useRef<Vapi | null>(null);
-    const [conversation, setConversation] = useState<any[]>([]);
+    const conversationRef = useRef<any[]>([]);
 
     useEffect(() => {
         if (!import.meta.env.VITE_VAPI_PUBLIC_KEY) {
@@ -78,7 +78,7 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
         const onMessage = (message: any) => {
             console.log(message);
             if (message?.type === "conversation-update") {
-                setConversation(message.conversation);
+                conversationRef.current = message.conversation;
             }
         };
 
@@ -111,11 +111,11 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
     }, [setIsSpeaking]);
 
     // --- remove it ---
-    useEffect(() => {
-        if (conversation.length > 0) {
-            console.log("Conversation updated:", conversation);
-        }
-    }, [conversation]);
+    // useEffect(() => {
+    //     if (conversationRef.current.length > 0) {
+    //         console.log("Conversation updated:", conversationRef.current);
+    //     }
+    // }, [conversationRef.current]);
 
 
     const startVapi = (
@@ -167,5 +167,7 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
         console.log("Vapi stopped");
     };
 
-    return { startVapi, stopVapi, conversation };
+    const getConversation = () => conversationRef.current;
+
+    return { startVapi, stopVapi, getConversation };
 }

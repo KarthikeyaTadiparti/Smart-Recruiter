@@ -87,7 +87,8 @@ export async function getApplicationsByJobId(jobId: number) {
         })
         .from(applications)
         .innerJoin(users, eq(applications.candidateId, users.id))
-        .where(eq(applications.jobId, jobId));
+        .where(eq(applications.jobId, jobId))
+        .orderBy(desc(applications.overallScore));
 
     return jobApplications;
 }

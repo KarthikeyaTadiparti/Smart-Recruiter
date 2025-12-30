@@ -21,7 +21,7 @@ export const createApplication = wrapAsync(
         const conversation = req.body.conversation;
         const questions = req.body.questions;
 
-        console.log(questions);
+        // console.log(questions);
 
         const ai = new GoogleGenAI({
             apiKey: process.env.GEMINI_API_KEY!,
@@ -148,7 +148,6 @@ export const getApplication = wrapAsync(
     }
 );
 
-
 export const getApplicationsByCandidate = wrapAsync(
     async (req: Request, res: Response) => {
         const { candidateId } = req.params;
@@ -188,7 +187,6 @@ export const getApplicationsByCandidate = wrapAsync(
         });
     }
 );
-
 
 export const getApplicationsByJob = wrapAsync(
     async (req: Request, res: Response) => {
