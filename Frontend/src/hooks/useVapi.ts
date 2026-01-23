@@ -47,6 +47,10 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
     const vapiRef = useRef<Vapi | null>(null);
     const conversationRef = useRef<any[]>([]);
 
+    // Store the callback in a ref so the effect doesn't depend on it
+    const setIsSpeakingRef = useRef(setIsSpeaking);
+    setIsSpeakingRef.current = setIsSpeaking;
+
     useEffect(() => {
         if (!import.meta.env.VITE_VAPI_PUBLIC_KEY) {
             console.error("VAPI public key missing");
@@ -62,17 +66,17 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
 
         const onCallEnd = () => {
             console.log("Voice conversation ended");
-            setIsSpeaking(false);
+            setIsSpeakingRef.current(false);
         };
 
         const onSpeechStart = () => {
             console.log("Assistant started speaking");
-            setIsSpeaking(true);
+            setIsSpeakingRef.current(true);
         };
 
         const onSpeechEnd = () => {
             console.log("Assistant stopped speaking");
-            setIsSpeaking(false);
+            setIsSpeakingRef.current(false);
         };
 
         const onMessage = (message: any) => {
@@ -88,7 +92,7 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
             // Handle voice-provider ejects safely
             if (error?.error?.type === "ejected") {
                 console.warn("Call ejected by voice provider");
-                setIsSpeaking(false);
+                setIsSpeakingRef.current(false);
             }
         };
 
@@ -108,7 +112,7 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
             vapi.off("error", onError);
             vapi.stop();
         };
-    }, [setIsSpeaking]);
+    }, []);
 
     // --- remove it ---
     // useEffect(() => {
@@ -146,8 +150,8 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
             },
 
             model: {
-                provider: "google" as const,
-                model: "gemini-2.5-flash" as const,
+                provider: "openai" as const,
+                model: "gpt-4o-mini" as const,
                 messages: [
                     {
                         role: "system" as const,
