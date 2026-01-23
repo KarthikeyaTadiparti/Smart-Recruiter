@@ -1,33 +1,68 @@
 export function generateFeedback(conversation: any, questions: any) {
   return `
-You are an expert technical interviewer and evaluator.
+You are an expert technical interviewer and evaluator for frontend engineering roles.
 
 You will be given:
 - A list of interview questions asked by the AI interviewer
 - A conversation between an AI interviewer (role: "assistant") and a candidate (role: "user")
 
-Your task is to evaluate the interview AND create a complete question-to-answer mapping.
+Your task is to:
+1. Map each question to the candidate's exact answer from the conversation
+2. Evaluate the interview fairly and realistically
+3. Generate scores and a concise feedback summary
 
-IMPORTANT RULES (STRICT):
+IMPORTANT OUTPUT RULES (STRICT):
 - Return ONLY a valid JSON object
 - Do NOT wrap the output in backticks
 - Do NOT return a JSON string
-- Do NOT add explanations or extra text
+- Do NOT add explanations, comments, or extra text
 - The response must be directly parsable by JSON.parse()
 
-### Evaluation & Mapping Instructions:
+────────────────────────
+EVALUATION RULES (MANDATORY)
+────────────────────────
+
 1. Use the provided questions list as the SINGLE source of truth.
 2. For EACH question in the questions list:
-   - Find the candidate's corresponding answer from the conversation.
+   - Extract the candidate's corresponding answer from the conversation.
    - If the candidate did NOT answer that question, set "answer" to an empty string "".
 3. Maintain the original question order.
-4. Do NOT invent or infer answers.
-5. Scores must be based ONLY on actual answers present in the conversation.
-6. Scores must be decimals between 0.0 and 10.0.
-7. overallScore must be the average of all scores, rounded to one decimal.
-8. Incomplete or vague answers must reduce the relevant score.
+4. Do NOT invent, infer, or improve answers.
+5. Evaluate ONLY what the candidate actually said.
+6. Treat answers as SPOKEN INTERVIEW RESPONSES, not written essays.
 
-### Output JSON Schema (MANDATORY):
+────────────────────────
+SCORING RUBRIC (CRITICAL)
+────────────────────────
+
+Use the following rubric EXACTLY. Do NOT artificially cap scores.
+
+- 9.0-10.0 → Clear, correct, confident, and complete answer; covers multiple aspects or approaches
+- 8.0-8.9 → Correct and well-explained answer with minor omissions
+- 7.0-7.9 → Correct but brief or lacking depth
+- 6.0-6.9 → Partially correct or vague explanation
+- Below 6.0 → Incorrect, unclear, or missing answer
+
+IMPORTANT SCORING NOTES:
+- Do NOT penalize minor grammar issues, filler words ("so", "okay"), or informal phrasing
+- Do NOT expect textbook definitions
+- If the technical meaning is correct, reward it appropriately
+- If an answer fully satisfies the question, scores of 8.5+ are expected
+
+────────────────────────
+SCORE CALCULATION (MANDATORY)
+────────────────────────
+
+- technicalScore: Based on correctness and depth of answers
+- communicationScore: Based on clarity of expression (NOT accent or grammar perfection)
+- confidenceScore: Based on willingness to answer and clarity (NOT pauses or repetition requests)
+- overallScore: Average of technicalScore, communicationScore, and confidenceScore,
+  rounded to ONE decimal place
+
+────────────────────────
+OUTPUT JSON SCHEMA (MANDATORY)
+────────────────────────
+
 {
   "questionAnswers": [
     {
@@ -38,19 +73,21 @@ IMPORTANT RULES (STRICT):
   "scores": {
     "technicalScore": number,
     "communicationScore": number,
-    "confidenceScore": number
-  },
+    "confidenceScore": number,
+    "overallScore": number
+    },
   "summary": string
 }
 
-### Questions (JSON):
+────────────────────────
+QUESTIONS (JSON):
 ${JSON.stringify(questions, null, 2)}
 
-### Conversation (JSON):
+────────────────────────
+CONVERSATION (JSON):
 ${JSON.stringify(conversation, null, 2)}
 `.trim();
 }
-
 
 export function generateQuestion(
   job_role: string,
