@@ -92,13 +92,7 @@ export const createApplication = wrapAsync(
         }
 
         const scores = feedbackJson.scores;
-        const overallScore = Number(
-            (
-                (Number(scores?.technicalScore) +
-                    Number(scores?.communicationScore) +
-                    Number(scores?.confidenceScore)) / 3
-            ).toFixed(1)
-        );
+        
         const application: Application = {
             candidateId: userId,
             jobId: jobId,
@@ -106,7 +100,7 @@ export const createApplication = wrapAsync(
             technicalScore: Number(scores?.technicalScore),
             communicationScore: Number(scores?.communicationScore),
             confidenceScore: Number(scores?.confidenceScore),
-            overallScore: Number(overallScore),
+            overallScore: Number(scores?.overallScore),
 
             tabSwitches: Number(tabSwitches),
             conversation: conversation,
