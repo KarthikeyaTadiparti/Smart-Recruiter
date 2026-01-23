@@ -36,7 +36,7 @@ export default function Interview() {
     const [isSpeaking, setIsSpeaking] = useState(false);
 
     const { videoRef, error } = useCamera(started, ended, setIsVideoOn);
-    // const { tabSwitches, violation, setViolation, enterFullscreen } = useProctoring(started, ended);
+    const { tabSwitches, violation, setViolation, enterFullscreen } = useProctoring(started, ended);
     const { timeLeft, isTimeUp } = useInterviewTimer(
         started,
         ended,
@@ -78,7 +78,7 @@ export default function Interview() {
         if (!userData?.name || !interview) return;
 
         setStarted(true);
-        // enterFullscreen();
+        enterFullscreen();
 
         startVapi(userData?.name, interview?.jobRole, interview?.questions);
     };
@@ -91,7 +91,7 @@ export default function Interview() {
         try {
             const { payload } = await dispatch(
                 _saveConversation({
-                    data: { jobId, conversation: getConversation(), tabSwitches: 0, questions: interview?.questions },
+                    data: { jobId, conversation: getConversation(), tabSwitches, questions: interview?.questions },
                     navigate,
                 })
             );
@@ -128,11 +128,11 @@ export default function Interview() {
 
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900 relative">
-            {/* <LogDialog
+            <LogDialog
                 violation={violation}
                 onClose={() => setViolation(null)}
                 onReEnterFullscreen={enterFullscreen}
-            /> */}
+            />
 
             <InterviewHeader
                 jobRole={interview.jobRole}
@@ -144,7 +144,7 @@ export default function Interview() {
                 videoRef={videoRef}
                 cameraError={error}
                 timeLeft={timeLeft}
-                tabSwitches={0}
+                tabSwitches={tabSwitches}
                 stopInterview={stopInterview}
                 setIsMicOn={setIsMicOn}
                 isMicOn={isMicOn}

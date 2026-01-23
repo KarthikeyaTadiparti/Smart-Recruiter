@@ -123,12 +123,12 @@ function Feedback() {
                         value={application.confidenceScore}
                         icon={CircleCheckBig}
                     />
-                    {/* <MetricCard
+                    <MetricCard
                         title="Tab Switches"
                         value={application.tabSwitches.toString()}
                         icon={MonitorOff}
                         isWarning={application.tabSwitches > 3}
-                    /> */}
+                    />
                 </div>
             </section>
 
