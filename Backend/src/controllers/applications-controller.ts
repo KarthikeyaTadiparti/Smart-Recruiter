@@ -4,7 +4,6 @@ import { Application } from "../types/interview.ts";
 import {
     addApplication,
     getApplicationById,
-    getAllApplications,
     getApplicationsByCandidateId,
     getApplicationsByJobId,
 } from "../services/applications-services.ts";
@@ -201,20 +200,5 @@ export const getApplicationsByJob = wrapAsync(
         });
     }
 );
-
-
-export const getAllApplicationsController = wrapAsync(
-    async (req: Request, res: Response) => {
-        const applications = await getAllApplications();
-
-        return res.status(200).json({
-            status: true,
-            message: "Applications retrieved successfully",
-            applications,
-            count: applications.length,
-        });
-    }
-);
-
 
 

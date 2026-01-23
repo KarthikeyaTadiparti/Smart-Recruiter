@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef } from "react";
 import Vapi from "@vapi-ai/web";
 import { Question } from "@/types/types";
 import { vapiPrompt } from "@/lib/prompts";
@@ -113,14 +113,6 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
             vapi.stop();
         };
     }, []);
-
-    // --- remove it ---
-    // useEffect(() => {
-    //     if (conversationRef.current.length > 0) {
-    //         console.log("Conversation updated:", conversationRef.current);
-    //     }
-    // }, [conversationRef.current]);
-
 
     const startVapi = (
         name: string | null,

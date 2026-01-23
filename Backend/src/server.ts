@@ -10,7 +10,7 @@ import morganMiddleware from "./config/morgan.ts";
 import db from "./config/db.ts";
 import { users } from "./schema/users-schema.ts";
 import interviewRoutes from "./routes/interview-routes.ts";
-import feedbackRoutes from "./routes/feedback-routes.ts";
+import feedbackRoutes from "./routes/applications-routes.ts";
 
 const app = express();
 const { PORT, APP_URL } = process.env;

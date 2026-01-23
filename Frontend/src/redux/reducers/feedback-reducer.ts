@@ -1,11 +1,7 @@
-import { Application, Candidate } from "@/types/types";
 import { createSlice } from "@reduxjs/toolkit";
 import { _getFeedback, _getFeedbacksByCandidateId, _getFeedbacksByJobId, _saveConversation } from "../actions/feedback-actions";
 
 interface FeedbackState {
-    // --- remove it ---
-    application: Application | null;
-    candidate: Candidate | null;
     loading: {
         fetch: boolean;
         post: boolean;
@@ -14,8 +10,6 @@ interface FeedbackState {
 }
 
 const initialState: FeedbackState = {
-    application: null,
-    candidate: null,
     loading: {
         fetch: false,
         post: false,
@@ -33,10 +27,8 @@ const feedbackSlice = createSlice({
             .addCase(_getFeedback.pending, (state) => {
                 state.loading.fetch = true;
             })
-            .addCase(_getFeedback.fulfilled, (state, action) => {
+            .addCase(_getFeedback.fulfilled, (state) => {
                 state.loading.fetch = false;
-                state.application = action.payload.data.application;
-                state.candidate = action.payload.data.candidate;
             })
             .addCase(_getFeedback.rejected, (state, action) => {
                 state.loading.fetch = false;
@@ -73,9 +65,6 @@ const feedbackSlice = createSlice({
             })
             .addCase(_saveConversation.fulfilled, (state) => {
                 state.loading.post = false;
-                // --- remove it ---
-                // state.application = action.payload.data.application;
-                // state.candidate = action.payload.data.candidate;
             })
             .addCase(_saveConversation.rejected, (state, action) => {
                 state.loading.post = false;

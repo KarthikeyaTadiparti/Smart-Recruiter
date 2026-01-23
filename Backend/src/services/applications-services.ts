@@ -37,12 +37,6 @@ export async function getApplicationById(applicationId: number) {
     return result;
 }
 
-// --- remove it ---
-export async function getAllApplications() {
-    const allApplications = await db.select().from(applications);
-
-    return allApplications;
-}
 
 export async function getApplicationsByCandidateId(candidateId: number) {
     if (!Number.isInteger(candidateId) || candidateId <= 0) {

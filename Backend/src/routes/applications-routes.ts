@@ -2,10 +2,9 @@ import express from "express";
 import {
     createApplication,
     getApplication,
-    getAllApplicationsController,
     getApplicationsByCandidate,
     getApplicationsByJob,
-} from "../controllers/feedback-controller.ts";
+} from "../controllers/applications-controller.ts";
 import { ensureAuthentication } from "../middlewares/auth.ts";
 
 const feedbackRouter = express.Router();
@@ -26,11 +25,6 @@ feedbackRouter.get(
     ensureAuthentication,
     getApplicationsByJob
 );
-
-
-// Get all applications
-feedbackRouter.get("/", ensureAuthentication, getAllApplicationsController);
-
 
 
 export default feedbackRouter;
