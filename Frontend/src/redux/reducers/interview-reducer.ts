@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { _getInterview } from "../actions/interview-actions";
-import { interview } from "@/types/types";
+import { Interview } from "@/types/types";
 
 
 interface InterviewInitialStateType {
@@ -8,7 +8,7 @@ interface InterviewInitialStateType {
         fetch: boolean;
     };
     error: string | null;
-    interview: interview;
+    interview: Interview;
 }
 
 const initialState: InterviewInitialStateType = {

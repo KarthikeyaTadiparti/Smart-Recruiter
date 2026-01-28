@@ -21,7 +21,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import { _generateQuestions } from "@/redux/actions/job-actions";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import DatePickerButtonRHF from "@/components/DatePickerButtonRHF";
 import { Spinner } from "@/components/ui/spinner";
 
