@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/use-redux';
-import { _getFeedback } from '@/redux/actions/feedback-actions';
+import { _getApplication } from '@/redux/actions/application-actions';
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +19,7 @@ import { FeedbackData } from '@/types/types';
 
 function Feedback() {
     const { id } = useParams<{ id: string }>();
-    const { loading } = useAppSelector((state) => state.feedback);
+    const { loading } = useAppSelector((state) => state.application);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [feedback, setFeedback] = useState<FeedbackData | null>(null);
@@ -29,7 +29,7 @@ function Feedback() {
         const fetchFeedback = async () => {
             try {
                 const { payload } = await dispatch(
-                    _getFeedback({ id: Number(id), navigate })
+                    _getApplication({ id: Number(id), navigate })
                 );
 
                 if (payload?.data?.status) {

@@ -36,7 +36,7 @@ app.use("/auth", authRoutes);
 app.use("/companies", companyRoutes);
 app.use("/jobs", jobRoutes);
 app.use("/interviews", interviewRoutes);
-app.use("/feedbacks", feedbackRoutes);
+app.use("/applications", feedbackRoutes);
 
 /* -------------------- TEST ROUTE -------------------- */
 app.get("/test", async (req, res) => {
@@ -57,7 +57,7 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     //Connect Redis
-    await connectRedis();
+    // await connectRedis();
 
     //Start server
     app.listen(PORT, () => {

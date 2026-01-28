@@ -13,7 +13,7 @@ import { useVapi } from "@/hooks/useVapi";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
 import { _getInterview } from "@/redux/actions/interview-actions";
-import { _saveConversation } from "@/redux/actions/feedback-actions";
+import { _saveConversation } from "@/redux/actions/application-actions";
 import { Interview as InterviewType } from "@/types/types";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
@@ -25,7 +25,7 @@ export default function Interview() {
 
     const userData = useAppSelector((state) => state.auth.userData);
     const { fetch } = useAppSelector((state) => state.interview.loading);
-    const { post } = useAppSelector((state) => state.feedback.loading);
+    const { post } = useAppSelector((state) => state.application.loading);
 
     const [started, setStarted] = useState(false);
     const [ended, setEnded] = useState(false);

@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/use-redux';
 import { RootState } from '@/redux/store';
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react';
-import { _getFeedbacksByCandidateId } from '@/redux/actions/feedback-actions';
+import { _getApplicationsByCandidateId } from '@/redux/actions/application-actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CalendarFold } from 'lucide-react'
@@ -13,7 +13,7 @@ function MyInterviews() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { userData } = useAppSelector((state: RootState) => state.auth);
-  const { loading } = useAppSelector((state: RootState) => state.feedback);
+  const { loading } = useAppSelector((state: RootState) => state.application);
 
   const [candidateApplications, setCandidateApplications] = useState<Application[]>([]);
 
@@ -21,7 +21,7 @@ function MyInterviews() {
     const fetch = async () => {
       if (userData.id) {
         try {
-          const { payload } = await dispatch(_getFeedbacksByCandidateId({ id: userData.id, navigate }));
+          const { payload } = await dispatch(_getApplicationsByCandidateId({ id: userData.id, navigate }));
           setCandidateApplications(payload.data.applications);
         } catch (error) {
           console.log(error);

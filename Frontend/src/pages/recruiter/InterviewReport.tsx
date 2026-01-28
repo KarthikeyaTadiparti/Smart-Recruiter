@@ -19,7 +19,7 @@ import {
     TableRow
 } from "@/components/ui/table";
 import { useAppDispatch, useAppSelector } from '@/hooks/use-redux';
-import { _getFeedbacksByJobId } from '@/redux/actions/feedback-actions';
+import { _getApplicationsByJobId } from '@/redux/actions/application-actions';
 import { Spinner } from '@/components/ui/spinner';
 import { FeedbackData } from '@/types/types';
 
@@ -27,7 +27,7 @@ const InterviewReport = () => {
     const { id } = useParams();
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { loading } = useAppSelector((state) => state.feedback);
+    const { loading } = useAppSelector((state) => state.application);
     const [applications, setApplications] = useState<FeedbackData[]>([]);
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +37,7 @@ const InterviewReport = () => {
         const fetchApplications = async () => {
             if (id) {
                 try {
-                    const { payload } = await dispatch(_getFeedbacksByJobId({ id, navigate }));
+                    const { payload } = await dispatch(_getApplicationsByJobId({ id, navigate }));
                     setApplications(payload.data.applications);
                 }
                 catch (error) {
@@ -58,7 +58,7 @@ const InterviewReport = () => {
     };
 
     const handleNavigation = (applicationId: number) => {
-        navigate(`/recruiter/feedback/${applicationId}`);
+        navigate(`/recruiter/application/${applicationId}`);
     }
 
     const filteredApplications = applications.filter(app => {

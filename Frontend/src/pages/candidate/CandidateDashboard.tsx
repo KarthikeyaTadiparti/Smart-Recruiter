@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { _getFeedbacksByCandidateId } from "@/redux/actions/feedback-actions";
+import { _getApplicationsByCandidateId } from "@/redux/actions/application-actions";
 import { useNavigate } from "react-router-dom";
 import { Application, CandidateMetrics, Metric } from "@/types/types";
 import { Spinner } from "@/components/ui/spinner";
@@ -27,8 +27,8 @@ import { RootState } from "@/redux/reducers";
 export default function CandidateDashboard() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { userData } = useAppSelector((state:RootState) => state.auth);
-  const { loading } = useAppSelector((state:RootState) => state.feedback);
+  const { userData } = useAppSelector((state: RootState) => state.auth);
+  const { loading } = useAppSelector((state: RootState) => state.application);
 
   const [candidateApplications, setCandidateApplications] = useState<Application[]>([]);
   const [candidateMetrics, setCandidateMetrics] = useState<CandidateMetrics | null>(null);
@@ -37,7 +37,7 @@ export default function CandidateDashboard() {
     const fetch = async () => {
       if (userData.id) {
         try {
-          const { payload } = await dispatch(_getFeedbacksByCandidateId({ id: userData.id, navigate }));
+          const { payload } = await dispatch(_getApplicationsByCandidateId({ id: userData.id, navigate }));
           setCandidateMetrics(payload.data.metrics);
           setCandidateApplications(payload.data.applications);
         } catch (error) {

@@ -16,8 +16,8 @@ import MyInterviews from "./pages/candidate/MyInterviews";
 import InterviewQuestions from "./pages/recruiter/InterviewQuestions";
 import Job from "./pages/candidate/Job";
 import Interview from "./pages/candidate/Interview";
-import Feedback from "./pages/candidate/Feedback";
 import InterviewReport from "./pages/recruiter/InterviewReport";
+import Application from "./pages/candidate/Application";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
@@ -88,7 +88,7 @@ function App() {
           <Route path="create-interview" element={<CreateInterview />} />
           <Route path="manage-interview" element={<ManageInterview />} />
           <Route path="manage-interview/:id" element={<InterviewReport />} />
-          <Route path="feedback/:id" element={<Feedback />} />
+          <Route path="application/:id" element={<Application />} />
           <Route path="interview-questions/:id" element={<InterviewQuestions />} />
         </Route>
 
@@ -97,7 +97,7 @@ function App() {
           <Route path="explore" element={<Explore />} />
           <Route path="explore/:id" element={<Job />} />
           <Route path="my-interviews" element={<MyInterviews />} />
-          <Route path="my-interviews/:id" element={<Feedback />} />
+          <Route path="my-interviews/:id" element={<Application />} />
         </Route>
       </Routes>
 

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { _getFeedback, _getFeedbacksByCandidateId, _getFeedbacksByJobId, _saveConversation } from "../actions/feedback-actions";
+import { _getApplication, _getApplicationsByCandidateId, _getApplicationsByJobId, _saveConversation } from "../actions/application-actions";
 
-interface FeedbackState {
+interface ApplicationState {
     loading: {
         fetch: boolean;
         post: boolean;
@@ -9,7 +9,7 @@ interface FeedbackState {
     error: any;
 }
 
-const initialState: FeedbackState = {
+const initialState: ApplicationState = {
     loading: {
         fetch: false,
         post: false,
@@ -17,44 +17,44 @@ const initialState: FeedbackState = {
     error: null,
 };
 
-const feedbackSlice = createSlice({
-    name: "feedback",
+const applicationSlice = createSlice({
+    name: "application",
     initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
-            // get Feedback by id
-            .addCase(_getFeedback.pending, (state) => {
+            // get application by id
+            .addCase(_getApplication.pending, (state) => {
                 state.loading.fetch = true;
             })
-            .addCase(_getFeedback.fulfilled, (state) => {
+            .addCase(_getApplication.fulfilled, (state) => {
                 state.loading.fetch = false;
             })
-            .addCase(_getFeedback.rejected, (state, action) => {
+            .addCase(_getApplication.rejected, (state, action) => {
                 state.loading.fetch = false;
                 state.error = action.error.message;
             })
 
-            // get Feedbacks by job id
-            .addCase(_getFeedbacksByJobId.pending, (state) => {
+            // get applications by job id
+            .addCase(_getApplicationsByJobId.pending, (state) => {
                 state.loading.fetch = true;
             })
-            .addCase(_getFeedbacksByJobId.fulfilled, (state) => {
+            .addCase(_getApplicationsByJobId.fulfilled, (state) => {
                 state.loading.fetch = false;
             })
-            .addCase(_getFeedbacksByJobId.rejected, (state, action) => {
+            .addCase(_getApplicationsByJobId.rejected, (state, action) => {
                 state.loading.fetch = false;
                 state.error = action.error.message;
             })
 
-            // get Feedbacks by candidate id
-            .addCase(_getFeedbacksByCandidateId.pending, (state) => {
+            // get applications by candidate id
+            .addCase(_getApplicationsByCandidateId.pending, (state) => {
                 state.loading.fetch = true;
             })
-            .addCase(_getFeedbacksByCandidateId.fulfilled, (state) => {
+            .addCase(_getApplicationsByCandidateId.fulfilled, (state) => {
                 state.loading.fetch = false;
             })
-            .addCase(_getFeedbacksByCandidateId.rejected, (state, action) => {
+            .addCase(_getApplicationsByCandidateId.rejected, (state, action) => {
                 state.loading.fetch = false;
                 state.error = action.error.message;
             })
@@ -73,4 +73,4 @@ const feedbackSlice = createSlice({
     }
 });
 
-export default feedbackSlice.reducer;
+export default applicationSlice.reducer;
