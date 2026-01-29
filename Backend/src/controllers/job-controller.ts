@@ -6,6 +6,7 @@ import ExpressError from "../middlewares/errorhandler.ts";
 import { addJob } from "../services/jobs-services.ts";
 import { addQuestions } from "../services/jobs-services.ts";
 import { generateQuestion } from "../utils/prompts.ts";
+import { invalidateKeys } from "../utils/cacheInvalidation.ts";
 
 export const generateInterviewQuestions = wrapAsync(
     async (req: Request, res: Response) => {
@@ -62,27 +63,17 @@ export const generateInterviewQuestions = wrapAsync(
         } catch (err: any) {
             // Gemini overload handling
             if (err?.error?.code === 503) {
-                return res.status(503).json({
-                    status: false,
-                    message:
-                        "AI service is currently busy. Please try again in a moment.",
-                });
+                throw new ExpressError(503, "AI service is currently busy. Please try again in a moment.");
             }
 
             console.error("Gemini error:", err);
-            return res.status(500).json({
-                status: false,
-                message: "Failed to generate interview questions",
-            });
+            throw new ExpressError(500, "Failed to generate interview questions");
         }
 
         const rawQuestion = response.text;
 
         if (!rawQuestion) {
-            return res.status(500).json({
-                status: false,
-                message: "AI did not return any questions",
-            });
+            throw new ExpressError(500, "AI did not return any questions");
         }
 
         // Clean markdown-wrapped JSON
@@ -96,10 +87,7 @@ export const generateInterviewQuestions = wrapAsync(
             questionsJSON = JSON.parse(cleanedQuestion);
         } catch (error) {
             console.error("Failed to parse questions:", cleanedQuestion);
-            return res.status(500).json({
-                status: false,
-                message: "Invalid AI question format",
-            });
+            throw new ExpressError(500, "Invalid AI question format");
         }
 
         // Ensure expected structure
@@ -107,10 +95,7 @@ export const generateInterviewQuestions = wrapAsync(
             !questionsJSON ||
             !Array.isArray(questionsJSON.questions)
         ) {
-            return res.status(500).json({
-                status: false,
-                message: "AI returned an unexpected questions format",
-            });
+            throw new ExpressError(500, "AI returned an unexpected questions format");
         }
 
         // Job Creation
@@ -127,6 +112,12 @@ export const generateInterviewQuestions = wrapAsync(
             interview_type,
             no_of_questions
         );
+
+        // Invalidate cache
+        invalidateKeys([
+            `jobs`,
+            `jobs:recruiter:${userId}`,
+        ]);
 
         return res.status(200).json({
             status: true,

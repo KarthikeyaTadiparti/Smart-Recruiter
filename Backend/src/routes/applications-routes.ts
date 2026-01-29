@@ -6,25 +6,28 @@ import {
     getApplicationsByJob,
 } from "../controllers/applications-controller.ts";
 import { ensureAuthentication } from "../middlewares/auth.ts";
+import { cache } from "../middlewares/cache.ts";
 
-const feedbackRouter = express.Router();
+const applicationRouter = express.Router();
 
-feedbackRouter.post("/", ensureAuthentication, createApplication);
-feedbackRouter.get("/:id", ensureAuthentication, getApplication);
+applicationRouter.post("/", ensureAuthentication, createApplication);
+applicationRouter.get("/:id", ensureAuthentication, cache((req) => `applications:id:${req.params.id}`), getApplication);
 
 // candidate can view their applications for various jobs
-feedbackRouter.get(
+applicationRouter.get(
     "/candidate/:candidateId",
     ensureAuthentication,
+    cache((req) => `applications:candidate:${req.params.candidateId}`),
     getApplicationsByCandidate
 );
 
 // recruiter can view applications for a specific job
-feedbackRouter.get(
+applicationRouter.get(
     "/job/:jobId",
     ensureAuthentication,
+    cache((req) => `applications:job:${req.params.jobId}`),
     getApplicationsByJob
 );
 
 
-export default feedbackRouter;
+export default applicationRouter;

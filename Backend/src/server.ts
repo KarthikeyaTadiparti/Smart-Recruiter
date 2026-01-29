@@ -57,7 +57,7 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     //Connect Redis
-    // await connectRedis();
+    await connectRedis();
 
     //Start server
     app.listen(PORT, () => {

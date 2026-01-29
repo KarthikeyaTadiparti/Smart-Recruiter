@@ -11,6 +11,8 @@ import wrapAsync from "../utils/wrap-async.ts";
 import { Request, Response } from "express";
 import ExpressError from "../middlewares/errorhandler.ts";
 import { safeAverage } from "../utils/utils.ts";
+import redisClient from "../config/redis.ts";
+import { invalidateKeys } from "../utils/cacheInvalidation.ts";
 
 export const createApplication = wrapAsync(
     async (req: Request, res: Response) => {
@@ -37,27 +39,17 @@ export const createApplication = wrapAsync(
         } catch (err: any) {
             // Gemini overload handling
             if (err?.error?.code === 503) {
-                return res.status(503).json({
-                    status: false,
-                    message:
-                        "AI service is currently busy. Please try again in a moment.",
-                });
+                throw new ExpressError(503, "AI service is currently busy. Please try again in a moment.");
             }
 
             console.error("Gemini error:", err);
-            return res.status(500).json({
-                status: false,
-                message: "Failed to generate AI feedback",
-            });
+            throw new ExpressError(500, "Failed to generate AI feedback");
         }
 
         const rawFeedback = response.text;
 
         if (!rawFeedback) {
-            return res.status(500).json({
-                status: false,
-                message: "AI did not return any feedback text",
-            });
+            throw new ExpressError(500, "AI did not return any feedback text");
         }
 
         // Clean markdown-wrapped JSON
@@ -71,10 +63,7 @@ export const createApplication = wrapAsync(
             feedbackJson = JSON.parse(cleanedFeedback);
         } catch (error) {
             console.error("LLM JSON parse error:", cleanedFeedback);
-            return res.status(500).json({
-                status: false,
-                message: "Invalid AI feedback format",
-            });
+            throw new ExpressError(500, "Invalid AI feedback format");
         }
 
         // Validate feedback structure
@@ -84,14 +73,11 @@ export const createApplication = wrapAsync(
             typeof feedbackJson.scores !== "object" ||
             typeof feedbackJson.summary !== "string"
         ) {
-            return res.status(500).json({
-                status: false,
-                message: "AI feedback structure is invalid",
-            });
+            throw new ExpressError(500, "AI feedback structure is invalid");
         }
 
         const scores = feedbackJson.scores;
-        
+
         const application: Application = {
             candidateId: userId,
             jobId: jobId,
@@ -108,6 +94,12 @@ export const createApplication = wrapAsync(
         };
 
         const dbresponse = await addApplication(application);
+
+        // Invalidate cache
+        await invalidateKeys([
+            `applications:candidate:${userId}`,
+            `applications:job:${jobId}`,
+        ]);
 
         return res.status(201).json({
             status: true,
