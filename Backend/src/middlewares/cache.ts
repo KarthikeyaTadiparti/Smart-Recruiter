@@ -8,7 +8,7 @@ export const cache = (keyBuilder: (req: Request) => string, ttl = 300) => {
         try {
             const cachedData = await redisClient.get(key);
             if (cachedData) {
-                console.log("Cache hit");
+                // console.log("Cache hit");
                 return res.json(JSON.parse(cachedData));
             }
         } catch (err: any) {
@@ -24,7 +24,7 @@ export const cache = (keyBuilder: (req: Request) => string, ttl = 300) => {
             // if the response is successful
             if (res.statusCode >= 200 && res.statusCode < 300) {
                 try {
-                    console.log("Cache miss");
+                    // console.log("Cache miss");
                     redisClient
                         .setEx(key, ttl, JSON.stringify(body))
                         .catch((err: any) => {

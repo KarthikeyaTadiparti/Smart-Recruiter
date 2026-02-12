@@ -16,7 +16,9 @@ import { connectRedis } from "./config/redis.ts";
 import { users } from "./schema/users-schema.ts";
 
 const app = express();
-const { PORT, APP_URL } = process.env;
+const APP_URL = process.env.APP_URL;
+const PORT: number = Number(process.env.PORT) || 3000;
+const HOST: string = '0.0.0.0';
 
 /* -------------------- CORS -------------------- */
 const corsOptions = {
@@ -60,7 +62,7 @@ const startServer = async () => {
     await connectRedis();
 
     //Start server
-    app.listen(PORT, () => {
+    app.listen(PORT, HOST, () => {
       console.log(`Server is listening on port ${PORT}`);
     });
   } catch (error) {
