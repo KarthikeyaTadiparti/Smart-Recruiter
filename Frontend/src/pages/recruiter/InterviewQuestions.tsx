@@ -1,6 +1,6 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
-import { Code, FolderOpen, HelpCircle, Lightbulb, Pencil, Trash2, UserRound } from "lucide-react";
+import { Check, Code, FolderOpen, HelpCircle, Lightbulb, Pencil, UserRound, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { JobQuestion } from "@/redux/reducers/job-reducer";
 import type { RootState } from "@/redux/store";
@@ -21,19 +21,37 @@ const getQuestionStyles = (typeString?: string) => {
     }
 };
 
-const InterviewQuestions: React.FC = () => {
+const InterviewQuestions = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
 
-    const jobQuestions = useAppSelector((state: RootState) => state.job.jobQuestions);
     const { loading } = useAppSelector((state: RootState) => state.job);
+    const jobQuestions = useAppSelector((state: RootState) => state.job.jobQuestions);
     const questions = Array.isArray(jobQuestions) ? jobQuestions : [];
 
+    // Local state for managing questions (so we can edit them)
+    // We initialize with the Redux state, but we also want to stay in sync if it loads later
+    const [localQuestions, setLocalQuestions] = useState<JobQuestion[]>([]);
+
+    // State to track which question is being edited
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [tempQuestion, setTempQuestion] = useState<string>("");
+
+    // Sync local state when redux state changes
+    useEffect(() => {
+        if (questions.length > 0 && localQuestions.length === 0) {
+            setLocalQuestions(questions);
+        }
+    }, [questions, localQuestions.length]);
+
+    // If we have local questions, use them. Otherwise fallback to props/redux.
+    const displayQuestions = localQuestions.length > 0 ? localQuestions : questions;
 
     const handleCreateInterview = async () => {
         try {
-            const { payload } = await dispatch(_createJob({ questions, id, navigate }));
+            // Use locally modified questions
+            const { payload } = await dispatch(_createJob({ questions: displayQuestions, id, navigate }));
 
             console.log("payload : ", payload);
 
@@ -49,6 +67,29 @@ const InterviewQuestions: React.FC = () => {
         }
     };
 
+    const handleEditQuestion = (index: number, currentQuestion: string) => {
+        setEditingIndex(index);
+        setTempQuestion(currentQuestion);
+    };
+
+    const handleSaveQuestion = () => {
+        if (editingIndex !== null) {
+            const updatedQuestions = [...localQuestions];
+            updatedQuestions[editingIndex] = {
+                ...updatedQuestions[editingIndex],
+                question: tempQuestion
+            };
+            setLocalQuestions(updatedQuestions);
+            setEditingIndex(null);
+            setTempQuestion("");
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingIndex(null);
+        setTempQuestion("");
+    };
+
     return (
         <main className="max-w-5xl mx-auto flex flex-1 flex-col p-4">
 
@@ -58,17 +99,18 @@ const InterviewQuestions: React.FC = () => {
                     <Spinner className="size-8" />
                 </div>
             )}
-            
+
             <div className="mb-6">
                 <h1 className="text-2xl font-semibold text-gray-900">Interview Questions</h1>
                 <p className="text-gray-500 text-sm mt-1">Review the generated questions for the candidate.</p>
             </div>
 
             <div className="space-y-4">
-                {questions.length > 0 ? (
-                    questions.map((item: JobQuestion, index: number) => {
+                {displayQuestions.length > 0 ? (
+                    displayQuestions.map((item: JobQuestion, index: number) => {
                         const { badge, Icon } = getQuestionStyles(item.type);
                         const key = (item as any).id ?? `${index}-${item.question?.slice(0, 20)}`;
+                        const isEditingThis = editingIndex === index;
 
                         return (
                             <div key={key} className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group">
@@ -86,16 +128,47 @@ const InterviewQuestions: React.FC = () => {
                                                 {item.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1) : "Question"}
                                             </span>
                                         </div>
-                                        <p className="text-gray-800 leading-relaxed text-[15px]">{item.question}</p>
+
+                                        {isEditingThis ? (
+                                            <textarea
+                                                value={tempQuestion}
+                                                onChange={(e) => setTempQuestion(e.target.value)}
+                                                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-[15px] text-gray-800"
+                                                rows={3}
+                                                autoFocus
+                                            />
+                                        ) : (
+                                            <p className="text-gray-800 leading-relaxed text-[15px]">{item.question}</p>
+                                        )}
                                     </div>
 
-                                    <div className="flex-shrink-0 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                        <button className="text-gray-400 hover:text-blue-600 p-1" title="Edit">
-                                            <Pencil className="w-4 h-4" />
-                                        </button>
-                                        <button className="text-gray-400 hover:text-red-600 p-1" title="Delete">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                    <div className="flex-shrink-0 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ opacity: isEditingThis ? 1 : undefined }}>
+                                        {!isEditingThis ? (
+                                            <button
+                                                onClick={() => handleEditQuestion(index, item.question)}
+                                                className="text-gray-400 hover:text-blue-600 p-1"
+                                                title="Edit"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                            </button>
+                                        ) : (
+                                            <div className="flex flex-col gap-2">
+                                                <button
+                                                    onClick={handleSaveQuestion}
+                                                    className="text-green-600 hover:text-green-700 p-1 bg-green-50 rounded-full"
+                                                    title="Save"
+                                                >
+                                                    <Check className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={handleCancelEdit}
+                                                    className="text-red-500 hover:text-red-600 p-1 bg-red-50 rounded-full"
+                                                    title="Cancel"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
