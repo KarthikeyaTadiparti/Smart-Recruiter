@@ -1,4 +1,4 @@
-# Use Node.js 22 Slim (Debian) for better compatibility
+# Use Node.js 22 Alpine for better compatibility
 FROM node:22-alpine
 
 # Set the working directory inside the container

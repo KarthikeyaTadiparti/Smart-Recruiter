@@ -9,9 +9,17 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./Frontend:/app
       - frontend_node_modules:/app/node_modules
     restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./Frontend
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./Frontend/package.json
 
   backend:
     build: ./Backend
@@ -25,10 +33,17 @@ services:
     depends_on:
       - redis
     volumes:
-      - ./Backend:/app
       - backend_node_modules:/app/node_modules
     restart: unless-stopped
-
+    develop:
+      watch:
+        - action: sync
+          path: ./Backend
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./Backend/package.json
 
   redisinsight:
     image: redis/redisinsight:latest
