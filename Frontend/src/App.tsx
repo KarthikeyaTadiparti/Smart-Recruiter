@@ -18,6 +18,7 @@ import Job from "./pages/candidate/Job";
 import Interview from "./pages/candidate/Interview";
 import InterviewReport from "./pages/recruiter/InterviewReport";
 import Application from "./pages/candidate/Application";
+import LandingPage from "./pages/LandingPage";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactNode }) => {
@@ -69,13 +70,13 @@ function App() {
   useEffect(() => {
     console.log("user data : ", userData);
     console.log("company details : ", company);
-  }, [userData,company]);
+  }, [userData, company]);
 
   return (
     <>
       <Routes>
         {/* default redirect */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<LandingPage />} />
 
         {/* public route */}
         <Route path="/login" element={<ProtectedAuthRoute element={<Login />} />} />
