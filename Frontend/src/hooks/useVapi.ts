@@ -8,13 +8,19 @@ function mapQuestionsToStrings(questions: Question[]): string[] {
     return questions.map((q) => q.question);
 }
 
-export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
+export function useVapi(
+    setIsSpeaking: Dispatch<SetStateAction<boolean>>,
+    onCriticalError?: () => void
+) {
     const vapiRef = useRef<Vapi | null>(null);
     const conversationRef = useRef<any[]>([]);
 
     // UI speaking state (React)
     const setIsSpeakingRef = useRef(setIsSpeaking);
     setIsSpeakingRef.current = setIsSpeaking;
+
+    const onCriticalErrorRef = useRef(onCriticalError);
+    onCriticalErrorRef.current = onCriticalError;
 
     // HARD LOCK: prevents overlapping assistant speech
     const isAssistantSpeakingRef = useRef(false);
@@ -64,11 +70,16 @@ export function useVapi(setIsSpeaking: Dispatch<SetStateAction<boolean>>) {
         const onError = (error: any) => {
             console.error("Vapi error:", error);
 
-            if (error?.error?.type === "ejected") {
-                console.warn("Call ejected by voice provider");
+            const isEjected = error?.error?.type === "ejected";
+
+            if (isEjected) {
+                console.warn("Call terminated by voice provider:", error?.errorMsg || error?.error?.msg);
                 isAssistantSpeakingRef.current = false;
                 setIsSpeakingRef.current(false);
-                //stop the interview
+
+                if (onCriticalErrorRef.current) {
+                    onCriticalErrorRef.current();
+                }
             }
         };
 

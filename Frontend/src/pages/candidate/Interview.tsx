@@ -46,7 +46,10 @@ export default function Interview() {
         interview?.interviewDuration ?? 0
     );
 
-    const { startVapi, stopVapi, getConversation } = useVapi(setIsSpeaking);
+    const { startVapi, stopVapi, getConversation } = useVapi(setIsSpeaking, () => {
+        toast.error("Interview terminated: Voice session ended unexpectedly.");
+        stopInterview();
+    });
 
     // --- fetches the interview details ---
     useEffect(() => {
@@ -94,7 +97,7 @@ export default function Interview() {
         startVapi(userData?.name, interview?.jobRole, interview?.questions);
     };
 
-    const stopInterview = async () => {
+    async function stopInterview() {
         if (ended) return;
         setEnded(true);
         stopVapi();
