@@ -47,6 +47,7 @@ const truncateWords = (text: string, maxWords = 12) => {
 ================================ */
 function Explore() {
     const [jobs, setJobs] = useState<Job[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const { loading } = useAppSelector((state) => state.job);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -71,6 +72,15 @@ function Explore() {
         navigate(`/candidate/explore/${jobId}`);
     };
 
+    const filteredJobs = jobs.filter((job) => {
+        const query = searchQuery.toLowerCase();
+        return (
+            job.jobRole.toLowerCase().includes(query) ||
+            job.techStack.toLowerCase().includes(query) ||
+            job.companyName.toLowerCase().includes(query)
+        );
+    });
+
     return (
         <>
             {/* Spinner */}
@@ -90,17 +100,24 @@ function Explore() {
                 </div>
 
                 {/* Search */}
-                <div className="flex items-center gap-3 border border-slate-200 px-4 py-2 rounded-md bg-white">
+                <div className="flex items-center gap-3 border border-slate-200 px-4 py-2 rounded-md bg-white focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                     <Search className="h-4 w-4 text-slate-400" />
                     <Input
-                        placeholder="Search by role or tech stack"
+                        placeholder="Search by role, company or tech stack"
                         className="border-none shadow-none focus-visible:ring-0 p-0"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
 
                 {/* Jobs Grid */}
                 <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {jobs.map((job) => {
+                    {filteredJobs.length === 0 && !loading.fetchAll ? (
+                        <div className="col-span-full py-12 text-center text-slate-500">
+                            No jobs found matching your search.
+                        </div>
+                    ) : (
+                        filteredJobs.map((job) => {
                         const closed = isClosed(job.closedAt);
 
                         return (
@@ -211,7 +228,8 @@ function Explore() {
                                 </Button>
                             </div>
                         );
-                    })}
+                        })
+                    )}
                 </section>
             </div>
         </>
