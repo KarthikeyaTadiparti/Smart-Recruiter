@@ -18,6 +18,9 @@ import { Interview as InterviewType } from "@/types/types";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 
+// --- OPTIONS ---
+const MAX_TAB_SWITCHES = 5;
+
 export default function Interview() {
     const { id: jobId } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -65,6 +68,14 @@ export default function Interview() {
             stopInterview();
         }
     }, [isTimeUp, ended]);
+
+    // --- terminate the interview after 5 tab switches ---
+    useEffect(() => {
+        if (tabSwitches >= MAX_TAB_SWITCHES && !ended) {
+            toast.error("Interview terminated: Maximum proctoring violations reached.");
+            stopInterview();
+        }
+    }, [tabSwitches, ended]);
 
     // --- remove it ---
     useEffect(() => {
@@ -130,6 +141,8 @@ export default function Interview() {
         <div className="min-h-screen bg-gray-50 text-gray-900 relative">
             <LogDialog
                 violation={violation}
+                tabSwitches={tabSwitches}
+                maxTabSwitches={MAX_TAB_SWITCHES}
                 onClose={() => setViolation(null)}
                 onReEnterFullscreen={enterFullscreen}
             />
@@ -145,6 +158,7 @@ export default function Interview() {
                 cameraError={error}
                 timeLeft={timeLeft}
                 tabSwitches={tabSwitches}
+                maxTabSwitches={MAX_TAB_SWITCHES}
                 stopInterview={stopInterview}
                 setIsMicOn={setIsMicOn}
                 isMicOn={isMicOn}

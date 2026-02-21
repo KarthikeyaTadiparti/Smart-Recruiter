@@ -6,6 +6,7 @@ function InterviewContent({
     interview,
     timeLeft,
     tabSwitches,
+    maxTabSwitches,
     stopInterview,
     videoRef,
     cameraError,
@@ -65,7 +66,7 @@ function InterviewContent({
                             {/* Tab Switch / Violation Badge inside Question Card - ALWAYS VISIBLE */}
                             <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium border transition-colors ${tabSwitches > 0 ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
                                 <ShieldAlert size={12} />
-                                <span>{tabSwitches} Violation{tabSwitches !== 1 ? 's' : ''}</span>
+                                <span>{tabSwitches} / {maxTabSwitches} Violation{tabSwitches !== 1 ? 's' : ''}</span>
                             </div>
                         </div>
 

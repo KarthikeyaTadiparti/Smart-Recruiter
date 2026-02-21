@@ -9,17 +9,21 @@ import { ViolationType } from "@/types/types";
 
 interface LogDialogProps {
     violation: ViolationType | null;
+    tabSwitches: number;
+    maxTabSwitches: number;
     onClose: () => void;
     onReEnterFullscreen: () => void;
 }
 
 function LogDialog({
     violation,
+    tabSwitches,
+    maxTabSwitches,
     onClose,
     onReEnterFullscreen,
 }: LogDialogProps) {
     return (
-        <Dialog open={!!violation} onOpenChange={() => {}}>
+        <Dialog open={!!violation} onOpenChange={() => { }}>
             <DialogContent
                 className="
                     max-w-sm
@@ -46,6 +50,9 @@ function LogDialog({
 
                             {violation === "FULLSCREEN_EXIT" &&
                                 "You exited fullscreen mode. Fullscreen is required to continue."}
+                        </p>
+                        <p className="mt-2 text-[10px] font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-md inline-block">
+                            Violation {tabSwitches} of {maxTabSwitches}. The interview will terminate after {maxTabSwitches} violations.
                         </p>
                     </div>
                 </div>
