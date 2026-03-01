@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import Vapi from "@vapi-ai/web";
 import { Question } from "@/types/types";
 import { vapiPrompt } from "@/lib/prompts";
@@ -8,10 +8,21 @@ function mapQuestionsToStrings(questions: Question[]): string[] {
     return questions.map((q) => q.question);
 }
 
+export const CallStatus = {
+    INACTIVE: 'INACTIVE',
+    CONNECTING: 'CONNECTING',
+    ACTIVE: 'ACTIVE',
+    FINISHED: 'FINISHED',
+} as const;
+
+export type CallStatus = typeof CallStatus[keyof typeof CallStatus];
+
 export function useVapi(
     setIsSpeaking: Dispatch<SetStateAction<boolean>>,
-    onCriticalError?: () => void
+    onCriticalError?: () => void,
+    onSpeechStart?: () => void
 ) {
+    const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
     const vapiRef = useRef<Vapi | null>(null);
     const conversationRef = useRef<any[]>([]);
 
@@ -21,6 +32,9 @@ export function useVapi(
 
     const onCriticalErrorRef = useRef(onCriticalError);
     onCriticalErrorRef.current = onCriticalError;
+
+    const onSpeechStartRef = useRef(onSpeechStart);
+    onSpeechStartRef.current = onSpeechStart;
 
     // HARD LOCK: prevents overlapping assistant speech
     const isAssistantSpeakingRef = useRef(false);
@@ -38,18 +52,24 @@ export function useVapi(
 
         const onCallStart = () => {
             console.log("Voice conversation started");
+            setCallStatus(CallStatus.ACTIVE)
         };
 
         const onCallEnd = () => {
             console.log("Voice conversation ended");
+            setCallStatus(CallStatus.FINISHED);
             isAssistantSpeakingRef.current = false;
             setIsSpeakingRef.current(false);
         };
 
-        const onSpeechStart = () => {
+        const onSpeechStartHandler = () => {
             console.log("Assistant started speaking");
             isAssistantSpeakingRef.current = true;
             setIsSpeakingRef.current(true);
+
+            if (onSpeechStartRef.current) {
+                onSpeechStartRef.current();
+            }
         };
 
         const onSpeechEnd = () => {
@@ -87,7 +107,7 @@ export function useVapi(
 
         vapi.on("call-start", onCallStart);
         vapi.on("call-end", onCallEnd);
-        vapi.on("speech-start", onSpeechStart);
+        vapi.on("speech-start", onSpeechStartHandler);
         vapi.on("speech-end", onSpeechEnd);
         vapi.on("message", onMessage);
         vapi.on("error", onError);
@@ -95,7 +115,7 @@ export function useVapi(
         return () => {
             vapi.off("call-start", onCallStart);
             vapi.off("call-end", onCallEnd);
-            vapi.off("speech-start", onSpeechStart);
+            vapi.off("speech-start", onSpeechStartHandler);
             vapi.off("speech-end", onSpeechEnd);
             vapi.off("message", onMessage);
             vapi.off("error", onError);
@@ -124,9 +144,9 @@ export function useVapi(
 
             transcriber: {
                 provider: "deepgram" as const,
-                model: "nova-2" as const,
+                model: "nova-3" as const,
                 language: "en-US" as const,
-                endpointing: 500, // FIX: avoid multiple turn triggers
+                endpointing: 500,
             },
 
             voice: {
@@ -147,6 +167,7 @@ export function useVapi(
         };
 
         vapiRef.current.start(assistantOptions);
+        setCallStatus(CallStatus.CONNECTING);
         console.log("Vapi started");
     };
 
@@ -156,6 +177,7 @@ export function useVapi(
         }
         isAssistantSpeakingRef.current = false;
         setIsSpeaking(false);
+        setCallStatus(CallStatus.INACTIVE);
         console.log("Vapi stopped");
     };
 

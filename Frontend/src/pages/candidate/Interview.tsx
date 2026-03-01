@@ -31,6 +31,7 @@ export default function Interview() {
     const { post } = useAppSelector((state) => state.application.loading);
 
     const [started, setStarted] = useState(false);
+    const [isConnecting, setIsConnecting] = useState(false);
     const [ended, setEnded] = useState(false);
     const [interview, setInterview] = useState<InterviewType | null>(null);
 
@@ -46,10 +47,18 @@ export default function Interview() {
         interview?.interviewDuration ?? 0
     );
 
-    const { startVapi, stopVapi, getConversation } = useVapi(setIsSpeaking, () => {
-        toast.error("Interview terminated: Voice session ended unexpectedly.");
-        stopInterview();
-    });
+    const { startVapi, stopVapi, getConversation } = useVapi(
+        setIsSpeaking,
+        () => {
+            toast.error("Interview terminated: Voice session ended unexpectedly.");
+            setIsConnecting(false);
+            stopInterview();
+        },
+        () => {
+            setStarted(true);
+            setIsConnecting(false);
+        }
+    );
 
     // --- fetches the interview details ---
     useEffect(() => {
@@ -89,9 +98,9 @@ export default function Interview() {
     }, [interview]);
 
     const startInterview = () => {
-        if (!userData?.name || !interview) return;
+        if (!userData?.name || !interview || isConnecting) return;
 
-        setStarted(true);
+        setIsConnecting(true);
         enterFullscreen();
 
         startVapi(userData?.name, interview?.jobRole, interview?.questions);
@@ -136,6 +145,7 @@ export default function Interview() {
             <StartScreen
                 interview={interview}
                 startInterview={startInterview}
+                isConnecting={isConnecting}
             />
         );
 

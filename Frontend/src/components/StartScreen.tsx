@@ -1,11 +1,12 @@
-import { Maximize, ShieldAlert } from 'lucide-react';
+import { Maximize, ShieldAlert, Loader2 } from 'lucide-react';
 
 interface StartScreenProp {
     interview: any;
     startInterview: () => void;
+    isConnecting: boolean;
 }
 
-function StartScreen({ interview, startInterview }: StartScreenProp) {
+function StartScreen({ interview, startInterview, isConnecting }: StartScreenProp) {
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans text-gray-900">
             <div className="max-w-lg w-full bg-white rounded-xl p-8 border border-gray-200 text-center shadow-lg">
@@ -33,9 +34,17 @@ function StartScreen({ interview, startInterview }: StartScreenProp) {
 
                 <button
                     onClick={startInterview}
-                    className="w-full bg-primary hover:opacity-90 text-white py-3 rounded-lg text-lg font-medium shadow-md transition-all flex items-center justify-center gap-2"
+                    disabled={isConnecting}
+                    className="w-full bg-primary hover:opacity-90 disabled:opacity-70 text-white py-3 rounded-lg text-lg font-medium shadow-md transition-all flex items-center justify-center gap-2"
                 >
-                    Start Interview
+                    {isConnecting ? (
+                        <>
+                            <Loader2 size={20} className="animate-spin" />
+                            Connecting...
+                        </>
+                    ) : (
+                        "Start Interview"
+                    )}
                 </button>
             </div>
         </div>
