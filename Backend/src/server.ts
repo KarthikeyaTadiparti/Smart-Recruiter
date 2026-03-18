@@ -2,6 +2,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import cookieParser from "cookie-parser";
+import {Chalk} from "chalk";
 
 import { errorHandler, handle404Error } from "./middlewares/errorhandler.ts";
 import authRoutes from "./routes/auth-routes.ts";
@@ -19,6 +20,8 @@ const app = express();
 const APP_URL = process.env.APP_URL;
 const PORT: number = Number(process.env.PORT) || 3000;
 const HOST: string = '0.0.0.0';
+const customChalk = new Chalk({ level: 3 });
+
 
 /* -------------------- CORS -------------------- */
 const corsOptions = {
@@ -64,6 +67,9 @@ const startServer = async () => {
     //Start server
     app.listen(PORT, HOST, () => {
       console.log(`Server is listening on port ${PORT}`);
+      console.log(`Frontend: ${customChalk.blue.underline("http://localhost:5173")}`);
+      console.log(`Database: ${customChalk.blue.underline("http://local.drizzle.studio")}`);
+      console.log(`Redis: ${customChalk.blue.underline("http://localhost:5540")}`);
     });
   } catch (error) {
     console.error("Server startup failed:", error);
