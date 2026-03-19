@@ -6,7 +6,11 @@ import {
     ShieldAlert,
     CheckCircle,
     AlertTriangle,
+    Check,
+    X,
 } from 'lucide-react';
+import { Post } from '@/lib/api-calls';
+import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +33,7 @@ const InterviewReport = () => {
     const navigate = useNavigate();
     const { loading } = useAppSelector((state) => state.application);
     const [applications, setApplications] = useState<FeedbackData[]>([]);
+    const [sendingEmailState, setSendingEmailState] = useState<{ id: number, type: 'accept' | 'reject' } | null>(null);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('All');
@@ -61,6 +66,28 @@ const InterviewReport = () => {
         navigate(`/recruiter/application/${applicationId}`);
     }
 
+    const handleSendEmail = async (applicationId: number, candidateEmail: string, candidateName: string, status: 'accept' | 'reject', jobRole: string) => {
+        setSendingEmailState({ id: applicationId, type: status });
+        const payload = {
+            applicationId,
+            candidateEmail,
+            candidateName,
+            status,
+            jobRole,
+        };
+        const res = await Post('/applications/send-email', payload, navigate);
+        if (res?.status === 200) {
+            toast.success(`Successfully sent ${status} email to ${candidateName}`);
+            
+            setApplications(prev => prev.map(app => 
+                app.application.applicationId === applicationId 
+                    ? { ...app, application: { ...app.application, status: res.data.newStatus } }
+                    : app
+            ));
+        }
+        setSendingEmailState(null);
+    };
+
     const filteredApplications = applications.filter(app => {
         const matchesSearch = app.candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             app.candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -74,7 +101,7 @@ const InterviewReport = () => {
     return (
         <div className="flex flex-1 flex-col">
 
-            {loading.fetch && (
+            {(loading.fetch || sendingEmailState) && (
                 <div className="absolute inset-0 z-60 grid place-items-center bg-white/70">
                     <Spinner className="size-8" />
                 </div>
@@ -117,8 +144,9 @@ const InterviewReport = () => {
                                 <TableHead className="py-5 px-8 font-bold text-slate-400 uppercase text-[10px] tracking-widest">Candidate</TableHead>
                                 <TableHead className="py-5 font-bold text-slate-400 uppercase text-[10px] tracking-widest">Overall Score</TableHead>
                                 <TableHead className="py-5 font-bold text-slate-400 uppercase text-[10px] tracking-widest">Tab Switches</TableHead>
-                                <TableHead className="py-5 font-bold text-slate-400 uppercase text-[10px] tracking-widest">Status</TableHead>
-                                <TableHead className="py-5 px-8 text-right font-bold text-slate-400 uppercase text-[10px] tracking-widest">Actions</TableHead>
+                                <TableHead className="py-5 font-bold text-slate-400 uppercase text-[10px] tracking-widest">Integrity</TableHead>
+                                <TableHead className="py-5 font-bold text-slate-400 uppercase text-[10px] tracking-widest">Actions</TableHead>
+                                <TableHead className="py-5 px-8 text-right font-bold text-slate-400 uppercase text-[10px] tracking-widest">Status</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -158,18 +186,55 @@ const InterviewReport = () => {
                                                 {status.label}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="py-6 px-6 text-right">
-                                            <Button
-                                                variant="outline"
-                                                className="bg-primary text-white hover:bg-primary/80 hover:text-white font-semibold text-xs gap-2 rounded-lg transition-all shadow-sm h-9 px-4"
-                                                onClick={() => {
-                                                    handleNavigation(app.application.applicationId);
-                                                }}
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                                View Details
-                                            </Button>
+                                        <TableCell className="py-6">
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    className="bg-primary text-white hover:bg-primary/80 hover:text-white font-semibold text-xs gap-2 rounded-lg transition-all shadow-sm h-9 px-4"
+                                                    onClick={() => {
+                                                        handleNavigation(app.application.applicationId);
+                                                    }}
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                    View Details
+                                                </Button>
+                                            </div>
                                         </TableCell>
+                                        <TableCell className="py-6 px-8 min-w-[180px] text-right">
+                                            <div className="flex justify-end items-center gap-2">
+                                                {(!app.application.status || app.application.status === 'pending') ? (
+                                                    <>
+                                                        <Button
+                                                            variant="outline"
+                                                            disabled={sendingEmailState?.id === app.application.applicationId}
+                                                            className="bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 hover:text-emerald-700 font-semibold text-xs gap-1 rounded-lg transition-all shadow-sm h-8 px-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                                                            onClick={() => {
+                                                                handleSendEmail(app.application.applicationId, app.candidate.email, app.candidate.name, 'accept', app.application.jobRole || 'the specified role');
+                                                            }}
+                                                        >
+                                                            <Check className="h-3 w-3" />
+                                                            Accept
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            disabled={sendingEmailState?.id === app.application.applicationId}
+                                                            className="bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100 hover:border-rose-300 hover:text-rose-700 font-semibold text-xs gap-1 rounded-lg transition-all shadow-sm h-8 px-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                                                            onClick={() => {
+                                                                handleSendEmail(app.application.applicationId, app.candidate.email, app.candidate.name, 'reject', app.application.jobRole || 'the specified role');
+                                                            }}
+                                                        >
+                                                            <X className="h-3 w-3" />
+                                                            Reject
+                                                        </Button>
+                                                    </>
+                                                ) : (
+                                                    <Badge variant="outline" className={`px-4 py-1.5 font-bold text-[10px] uppercase tracking-wider rounded-full ${app.application.status === 'selected' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
+                                                        {app.application.status === 'selected' ? 'Selected' : 'Rejected'}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        
                                     </TableRow>
                                 );
                             })}

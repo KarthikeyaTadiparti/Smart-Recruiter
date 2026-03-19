@@ -56,6 +56,7 @@ export interface Application {
     candidateId: number;
     jobId: number;
     jobRole: string;
+    status?: string;
     technicalScore: string;
     communicationScore: string;
     confidenceScore: string;

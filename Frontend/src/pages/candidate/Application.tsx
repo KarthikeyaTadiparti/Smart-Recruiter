@@ -78,7 +78,9 @@ function Feedback() {
                     <div className="flex flex-col gap-1">
                         <div className="flex flex-wrap items-center gap-2">
                             <h1 className="text-2xl font-bold tracking-tight capitalize">{candidate.name}'s Interview Results</h1>
-                            <Badge className="bg-emerald-500 px-2 py-1 rounded-full text-white border-none hover:bg-emerald-600">Completed</Badge>
+                            <Badge className={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full border ${(!application.status || application.status === 'pending') ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' : application.status === 'selected' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100'} shadow-none text-center`}>
+                                {(!application.status || application.status === 'pending') ? 'Under Review' : application.status === 'selected' ? 'Selected' : 'Rejected'}
+                            </Badge>
                         </div>
                         <p className="text-muted-foreground flex items-center gap-2 mt-1">
                             <Mail className="h-4 w-4" /> {candidate.email}

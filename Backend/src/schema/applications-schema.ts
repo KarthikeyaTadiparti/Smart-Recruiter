@@ -52,6 +52,7 @@ export const applications = pgTable("applications", {
     questionAnswers: jsonb("question_answers").notNull(),
 
     feedback: text("feedback").notNull(),
+    status: text("status").default("pending").notNull(),
 
     createdAt: timestamp("created_at", { withTimezone: true })
         .defaultNow()

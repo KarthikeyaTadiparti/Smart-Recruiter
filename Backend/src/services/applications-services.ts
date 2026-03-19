@@ -51,6 +51,7 @@ export async function getApplicationsByCandidateId(candidateId: number) {
             communicationScore : applications.communicationScore,
             confidenceScore : applications.confidenceScore,
             overallScore : applications.overallScore,
+            status : applications.status,
             feedback : applications.feedback,
             createdAt : applications.createdAt,
         })
@@ -73,6 +74,8 @@ export async function getApplicationsByJobId(jobId: number) {
                 applicationId: applications.applicationId,
                 overallScore: applications.overallScore,
                 tabSwitches: applications.tabSwitches,
+                status: applications.status,
+                jobRole: jobs.jobRole,
             },
             candidate: {
                 name: users.name,
@@ -81,8 +84,23 @@ export async function getApplicationsByJobId(jobId: number) {
         })
         .from(applications)
         .innerJoin(users, eq(applications.candidateId, users.id))
+        .innerJoin(jobs, eq(applications.jobId, jobs.jobId))
         .where(eq(applications.jobId, jobId))
         .orderBy(desc(applications.overallScore));
 
     return jobApplications;
+}
+
+export async function updateApplicationStatus(applicationId: number, status: string) {
+    if (!Number.isInteger(applicationId) || applicationId <= 0) {
+        throw new ExpressError(400, "Invalid application id");
+    }
+
+    const [updated] = await db
+        .update(applications)
+        .set({ status })
+        .where(eq(applications.applicationId, applicationId))
+        .returning();
+
+    return updated;
 }

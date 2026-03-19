@@ -6,13 +6,18 @@ import {
     getApplicationById,
     getApplicationsByCandidateId,
     getApplicationsByJobId,
+    updateApplicationStatus,
 } from "../services/applications-services.ts";
 import wrapAsync from "../utils/wrap-async.ts";
 import { Request, Response } from "express";
 import ExpressError from "../middlewares/errorhandler.ts";
 import { safeAverage } from "../utils/utils.ts";
-import redisClient from "../config/redis.ts";
 import { invalidateKeys } from "../utils/cacheInvalidation.ts";
+import { Resend } from "resend";
+import { getRejectedEmailContext, getSelectedEmailContext } from "../utils/email-template.ts";
+
+const resend = new Resend(process.env.RESEND_API_KEY!);
+
 
 export const createApplication = wrapAsync(
     async (req: Request, res: Response) => {
@@ -189,6 +194,59 @@ export const getApplicationsByJob = wrapAsync(
             message: "Job applications retrieved successfully",
             applications,
             count: applications.length,
+        });
+    }
+);
+
+export const sendApplicationEmail = wrapAsync(
+    async (req: Request, res: Response) => {
+        const { applicationId, candidateEmail, candidateName, status, jobRole } = req.body;
+
+        if (!applicationId || !candidateEmail || !candidateName || !status || !jobRole) {
+            throw new ExpressError(400, "Missing required fields");
+        }
+
+        let subject = "";
+        let htmlContext = "";
+        let newStatus = "";
+
+        if (status === "accept") {
+            subject = `Congratulations! You have been selected for ${jobRole}`;
+            htmlContext = getSelectedEmailContext(candidateName, jobRole);
+            newStatus = "selected";
+        } else if (status === "reject") {
+            subject = `Update regarding your application for ${jobRole}`;
+            htmlContext = getRejectedEmailContext(candidateName, jobRole);
+            newStatus = "rejected";
+        } else {
+            throw new ExpressError(400, "Invalid status");
+        }
+
+        try {
+            await resend.emails.send({
+                from: 'Smart-Recruiter <onboarding@resend.dev>',
+                to: [candidateEmail],
+                subject: subject,
+                html: htmlContext,
+            });
+            const updatedApp = await updateApplicationStatus(applicationId, newStatus);
+            
+            if (updatedApp) {
+                await invalidateKeys([
+                    `applications:candidate:${updatedApp.candidateId}`,
+                    `applications:job:${updatedApp.jobId}`,
+                    `applications:id:${applicationId}`,
+                ]);
+            }
+        } catch (error) {
+            console.error("Resend error:", error);
+            throw new ExpressError(500, "Failed to send email or update status");
+        }
+
+        return res.status(200).json({
+            status: true,
+            newStatus,
+            message: `Email sent successfully to ${candidateName}`,
         });
     }
 );

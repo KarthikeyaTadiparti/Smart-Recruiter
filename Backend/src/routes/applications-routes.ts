@@ -4,6 +4,7 @@ import {
     getApplication,
     getApplicationsByCandidate,
     getApplicationsByJob,
+    sendApplicationEmail,
 } from "../controllers/applications-controller.ts";
 import { ensureAuthentication } from "../middlewares/auth.ts";
 import { cache } from "../middlewares/cache.ts";
@@ -11,7 +12,9 @@ import { cache } from "../middlewares/cache.ts";
 const applicationRouter = express.Router();
 
 applicationRouter.post("/", ensureAuthentication, createApplication);
+applicationRouter.post("/send-email", ensureAuthentication, sendApplicationEmail);
 applicationRouter.get("/:id", ensureAuthentication, cache((req) => `applications:id:${req.params.id}`), getApplication);
+
 
 // candidate can view their applications for various jobs
 applicationRouter.get(

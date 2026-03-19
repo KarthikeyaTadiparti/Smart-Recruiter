@@ -141,9 +141,9 @@ export default function CandidateDashboard() {
                   </CardTitle>
                   <Badge
                     variant="outline"
-                    className="bg-green-100 text-green-700 px-2 py-1 text-sm rounded-full"
+                    className={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full border ${(!item.status || item.status === 'pending') ? 'bg-amber-50 text-amber-600 border-amber-200' : item.status === 'selected' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200'}`}
                   >
-                    Completed
+                    {(!item.status || item.status === 'pending') ? 'Under Review' : item.status === 'selected' ? 'Selected' : 'Rejected'}
                   </Badge>
                 </div>
 
