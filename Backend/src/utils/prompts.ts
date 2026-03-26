@@ -31,33 +31,48 @@ EVALUATION RULES (MANDATORY)
 5. Evaluate ONLY what the candidate actually said.
 6. Treat answers as SPOKEN INTERVIEW RESPONSES, not written essays.
 
+CRITICAL PENALTY RULE:
+- Any unanswered question MUST be treated as a score between 0.0 - 3.0 for technical evaluation.
+- If more than 50% of questions are unanswered, the technicalScore MUST NOT exceed 5.0.
+
 ────────────────────────
-SCORING RUBRIC (CRITICAL)
+SCORING RUBRIC (STRICT)
 ────────────────────────
 
-Use the following rubric EXACTLY. Do NOT artificially cap scores.
+Apply scoring PER QUESTION first, then average.
 
-- 9.0-10.0 → Clear, correct, confident, and complete answer; covers multiple aspects or approaches
-- 8.0-8.9 → Correct and well-explained answer with minor omissions
-- 7.0-7.9 → Correct but brief or lacking depth
-- 6.0-6.9 → Partially correct or vague explanation
-- Below 6.0 → Incorrect, unclear, or missing answer
+- 9.0-10.0 → Clear, correct, confident, and complete
+- 8.0-8.9 → Correct with minor gaps
+- 7.0-7.9 → Correct but shallow
+- 6.0-6.9 → Partially correct
+- 3.0-5.9 → Weak or incomplete understanding
+- 0.0-2.9 → No answer or incorrect
 
-IMPORTANT SCORING NOTES:
-- Do NOT penalize minor grammar issues, filler words ("so", "okay"), or informal phrasing
-- Do NOT expect textbook definitions
-- If the technical meaning is correct, reward it appropriately
-- If an answer fully satisfies the question, scores of 8.5+ are expected
+IMPORTANT:
+- Unanswered = 0-2.5 ONLY (never higher)
+- DO NOT ignore unanswered questions in averaging
+- DO NOT inflate scores due to one good answer
 
 ────────────────────────
 SCORE CALCULATION (MANDATORY)
 ────────────────────────
 
-- technicalScore: Based on correctness and depth of answers
-- communicationScore: Based on clarity of expression (NOT accent or grammar perfection)
-- confidenceScore: Based on willingness to answer and clarity (NOT pauses or repetition requests)
-- overallScore: Average of technicalScore, communicationScore, and confidenceScore,
-  rounded to ONE decimal place
+technicalScore:
+- Compute score for EACH question
+- Average across ALL questions (including unanswered)
+
+communicationScore:
+- Reduce if many answers are missing
+- If candidate answers <50% questions → cap at 6.5
+
+confidenceScore:
+- Based on willingness to attempt answers
+- If multiple skips → reduce score significantly
+- If >50% unanswered → cap at 6.0
+
+overallScore:
+- Average of technicalScore, communicationScore, and confidenceScore
+- Rounded to ONE decimal place
 
 ────────────────────────
 OUTPUT JSON SCHEMA (MANDATORY)
@@ -75,7 +90,7 @@ OUTPUT JSON SCHEMA (MANDATORY)
     "communicationScore": number,
     "confidenceScore": number,
     "overallScore": number
-    },
+  },
   "summary": string
 }
 
