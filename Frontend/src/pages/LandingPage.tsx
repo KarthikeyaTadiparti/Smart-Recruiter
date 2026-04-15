@@ -23,7 +23,7 @@ const LandingPage = () => {
                             Login
                         </Button>
                         <Button onClick={() => navigate("/signup")}>
-                            Get Started
+                            Sign Up
                         </Button>
                     </div>
                 </div>
