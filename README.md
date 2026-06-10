@@ -125,7 +125,8 @@ You need to configure environment variables for both the Backend and Frontend.
 PORT=3000
 NODE_ENV=development
 JWT_SECRET=your_super_secret_jwt_key
-GOOGLE_GENAI_API_KEY=your_gemini_api_key
+GEMINI_API_KEY=your_gemini_api_key
+RESEND_API_KEY=your_resend_api_key
 APP_URL=http://localhost:5173
 DATABASE_URL=postgresql://user:password@host/dbname?sslmode=require
 REDIS_URL=redis://localhost:6379
